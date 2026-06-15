@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Sidebar / TopBar stay dark navy */
+    --navy-950: #050d1a;
+    --navy-900: #0a1628;
+    --navy-800: #0f2040;
+    --navy-700: #162d56;
+    --navy-600: #1e3a6e;
+
+    /* Ombré accent */
+    --accent-red: #c0392b;
+    --accent-crimson: #7b1a1a;
+    --accent-red-bright: #e74c3c;
+
+    /* Light mode canvas */
+    --canvas-bg: #f4f6fa;
+    --surface-1: #ffffff;
+    --surface-2: #f0f3f9;
+    --surface-3: #e8edf6;
+    --border-light: rgba(10, 22, 40, 0.08);
+    --border-medium: rgba(10, 22, 40, 0.13);
+
+    /* Light mode text */
+    --text-primary: #0d1b36;
+    --text-secondary: #2e4270;
+    --text-muted: #7a8db5;
+
+    /* Buttons */
+    --gradient-button: linear-gradient(135deg, #1e3a6e 0%, #7b1a1a 60%, #c0392b 100%);
+    --gradient-button-hover: linear-gradient(135deg, #162d56 0%, #9b2226 60%, #e74c3c 100%);
+    --shadow-glow-red: 0 4px 20px rgba(192, 57, 43, 0.35);
+
+    /* Sidebar text (stays light on dark sidebar) */
+    --sidebar-text: #f0f4ff;
+    --sidebar-muted: #6a7fa8;
+    --sidebar-secondary: #b8c8e8;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--canvas-bg);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--surface-2);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-medium);
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(10, 22, 40, 0.25);
+  }
+}
+
+@layer utilities {
+  .btn-ombre {
+    background: var(--gradient-button);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-ombre:hover {
+    background: var(--gradient-button-hover);
+    box-shadow: var(--shadow-glow-red);
+    transform: translateY(-1px);
+  }
+
+  .text-gradient-ombre {
+    background: var(--gradient-button);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* ── Keyframes ─────────────────────────────────────────── */
+@keyframes rippleEffect {
+  0% { width: 0px; height: 0px; opacity: 0.5; }
+  100% { width: 600px; height: 600px; opacity: 0; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 16px rgba(192, 57, 43, 0.15); }
+  50% { box-shadow: 0 0 32px rgba(192, 57, 43, 0.4); }
+}
+
+.animate-ripple { animation: rippleEffect 0.7s linear forwards; }
+.animate-float { animation: float 4s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulseGlow 2.5s ease-in-out infinite; }
+.animate-fade-in-up { animation: fadeInUp 0.5s ease forwards; }
+
+/* Mermaid light-mode override */
+.mermaid svg { background: transparent !important; max-width: 100%; }
+.mermaid .node rect,
+.mermaid .node circle,
+.mermaid .node polygon {
+  fill: rgba(30, 58, 110, 0.08) !important;
+  stroke: rgba(192, 57, 43, 0.5) !important;
+}
+.mermaid .node .label { color: #0d1b36 !important; }
+.mermaid .edgePath .path { stroke: rgba(192, 57, 43, 0.5) !important; }
+.mermaid .edgeLabel {
+  background: #fff !important;
+  color: #2e4270 !important;
+}
