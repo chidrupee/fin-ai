@@ -12,13 +12,14 @@ import { findResult, SESSION_HISTORY } from './data/mockData';
 const INITIAL_STATE: AppState = {
   view: 'landing',
   currentQuery: '',
-  currentMode: 'visual',
+  currentMode: 'chat',
   pinnedDomains: [],
   currentResult: null,
   compareLeft: null,
   compareRight: null,
   isLoading: false,
   sessionHistory: SESSION_HISTORY,
+  currentSessionThreadId: undefined,
 };
 
 export default function App() {
@@ -28,16 +29,18 @@ export default function App() {
 
   const handleQuery = (query: string, mode: StrategyMode, pinnedIds: string[]) => {
     setIsLoading(true);
-    // Simulate AI processing delay
     setTimeout(() => {
-      const result = findResult(query);
+      const result = findResult(query, mode);
+      const resultWithMode = { ...result, query, mode };
+      const threadId = state.currentSessionThreadId || `thread-${Date.now()}`;
       setState((prev) => ({
         ...prev,
         view: 'results',
         currentQuery: query,
         currentMode: mode,
         pinnedDomains: pinnedIds,
-        currentResult: { ...result, query, mode },
+        currentResult: resultWithMode,
+        currentSessionThreadId: threadId,
       }));
       setIsLoading(false);
     }, 1400);
@@ -50,11 +53,12 @@ export default function App() {
       currentQuery: result.query,
       currentMode: result.mode,
       currentResult: result,
+      currentSessionThreadId: undefined,
     }));
   };
 
   const handleBack = () => {
-    setState((prev) => ({ ...prev, view: 'landing', currentResult: null, compareLeft: null, compareRight: null }));
+    setState((prev) => ({ ...prev, view: 'landing', currentResult: null, compareLeft: null, compareRight: null, currentSessionThreadId: undefined }));
   };
 
   const handleCompare = () => {
@@ -189,7 +193,7 @@ export default function App() {
               <Results
                 result={state.currentResult}
                 onBack={handleBack}
-                onNewQuery={(q) => handleQuery(q, state.currentMode, state.pinnedDomains)}
+                onNewQuery={(q, m) => handleQuery(q, m ?? state.currentMode, state.pinnedDomains)}
                 onCompare={handleCompare}
               />
             </motion.div>

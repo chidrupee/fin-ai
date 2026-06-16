@@ -14,7 +14,7 @@ interface CompareProps {
   sessionHistory: SessionGroup[];
 }
 
-export default function Compare({ leftResult, rightResult, onBack, onCloseRight, onNewQuery, sessionHistory }: CompareProps) {
+export default function Compare({ leftResult, rightResult, onBack, onCloseRight, onNewQuery }: CompareProps) {
   const [search, setSearch] = useState('');
 
   const handleSearch = () => {
@@ -127,16 +127,16 @@ export default function Compare({ leftResult, rightResult, onBack, onCloseRight,
                   </div>
                 </div>
 
-                <div style={{ width: '100%', maxWidth: 400 }}>
+                <div style={{ width: '100%', maxWidth: 450 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
                     <Clock size={14} color="var(--text-muted)" />
-                    <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Recent Queries</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Available Scenarios</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {sessionHistory.flatMap(group => group.sessions).slice(0, 4).map((session, i) => (
+                    {Object.values(MOCK_RESULTS).map((scenario, i) => (
                       <button
                         key={i}
-                        onClick={() => onNewQuery(session.query, 'right')}
+                        onClick={() => onNewQuery(scenario.query, 'right')}
                         style={{
                           background: 'var(--surface-1)', border: '1px solid var(--border-light)', borderRadius: 8, padding: '12px 16px',
                           display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left'
@@ -145,16 +145,21 @@ export default function Compare({ leftResult, rightResult, onBack, onCloseRight,
                         onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-light)'; }}
                       >
                         <span style={{ fontSize: 13, color: 'var(--text-secondary)', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: 12 }}>
-                          {session.query}
+                          {scenario.query}
                         </span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ 
-                            fontSize: 10, padding: '2px 6px', borderRadius: 4, background: 'var(--surface-2)', 
-                            color: 'var(--text-muted)', textTransform: 'capitalize' 
+                            fontSize: 10, padding: '3px 8px', borderRadius: 12, 
+                            background: scenario.mode === 'analytical' ? 'rgba(192,57,43,0.1)' : 
+                                        scenario.mode === 'visual' ? 'rgba(16,185,129,0.1)' : 
+                                        scenario.mode === 'spreadsheet' ? 'rgba(14,165,233,0.1)' : 'rgba(99,102,241,0.1)',
+                            color: scenario.mode === 'analytical' ? '#c0392b' : 
+                                   scenario.mode === 'visual' ? '#10b981' : 
+                                   scenario.mode === 'spreadsheet' ? '#0ea5e9' : '#6366f1',
+                            textTransform: 'capitalize', fontWeight: 600
                           }}>
-                            {MOCK_RESULTS[session.resultId]?.mode || 'analytical'}
+                            {scenario.mode}
                           </span>
-                          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{session.timestamp}</span>
                         </div>
                       </button>
                     ))}

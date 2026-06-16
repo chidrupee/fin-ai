@@ -1,6 +1,6 @@
 // ── Core Domain Types ─────────────────────────────────────────────────────────
 
-export type StrategyMode = 'analytical' | 'visual';
+export type StrategyMode = 'analytical' | 'visual' | 'chat' | 'spreadsheet';
 
 export type DataDomain = {
   id: string;
@@ -23,7 +23,6 @@ export type KPICard = {
 };
 
 export type ChartDataPoint = Record<string, string | number>;
-
 export type LineConfig = { key: string; color: string; label: string };
 
 export type ChartConfig = {
@@ -37,6 +36,8 @@ export type ChartConfig = {
   referenceValue?: number;
   data: ChartDataPoint[];
   color?: string;
+  drillDown?: Record<string, ChartDataPoint[]>; // click bar label → sub-data
+  filterKey?: string; // field to filter on (e.g. 'region')
 };
 
 export type DashboardLink = {
@@ -63,6 +64,30 @@ export type RecommendedPrompt = {
   query: string;
 };
 
+// ── Chat types ────────────────────────────────────────────────────────────────
+export type ChatMessage = {
+  id: string;
+  role: 'user' | 'ai';
+  content: string;
+  timestamp: string;
+  suggestedFollowUps?: string[];
+};
+
+// ── Spreadsheet types ─────────────────────────────────────────────────────────
+export type SpreadsheetColumn = {
+  key: string;
+  label: string;
+  type: 'text' | 'number' | 'currency' | 'percent';
+  width?: number;
+};
+
+export type SpreadsheetData = {
+  columns: SpreadsheetColumn[];
+  rows: Record<string, string | number>[];
+  summaryRow?: Record<string, string | number>;
+};
+
+// ── Query result ──────────────────────────────────────────────────────────────
 export type QueryResult = {
   id: string;
   query: string;
@@ -72,16 +97,23 @@ export type QueryResult = {
   narrative: NarrativeSection;
   charts: ChartConfig[];
   recommendedPrompts: RecommendedPrompt[];
+  chatMessages?: ChatMessage[];
+  spreadsheetData?: SpreadsheetData;
+};
+
+// ── Session / history ─────────────────────────────────────────────────────────
+export type SessionEntry = {
+  id: string;
+  query: string;
+  timestamp: string;
+  resultId: string;
+  sessionThreadId?: string; // groups follow-up queries
+  isFollowUp?: boolean;
 };
 
 export type SessionGroup = {
   label: string;
-  sessions: Array<{
-    id: string;
-    query: string;
-    timestamp: string;
-    resultId: string;
-  }>;
+  sessions: SessionEntry[];
 };
 
 export type AppState = {
@@ -94,4 +126,5 @@ export type AppState = {
   compareRight: QueryResult | null;
   isLoading: boolean;
   sessionHistory: SessionGroup[];
+  currentSessionThreadId?: string;
 };

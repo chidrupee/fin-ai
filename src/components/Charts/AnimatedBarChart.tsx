@@ -1,8 +1,10 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell,
 } from 'recharts';
+import { ArrowLeft } from 'lucide-react';
 import type { ChartDataPoint } from '../../types';
 
 interface AnimatedBarChartProps {
@@ -12,6 +14,7 @@ interface AnimatedBarChartProps {
   title: string;
   caption?: string;
   height?: number; // -1 = 100% fill
+  drillDown?: Record<string, ChartDataPoint[]>;
 }
 
 const GRADIENT_COLORS = [
@@ -42,9 +45,20 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-export default function AnimatedBarChart({ data, dataKey, xKey, title, caption, height = 210 }: AnimatedBarChartProps) {
-  const hasBudget = data.some((d) => 'budget' in d || 'target' in d);
-  const budgetKey = data[0] && 'budget' in data[0] ? 'budget' : 'target';
+export default function AnimatedBarChart({ data, dataKey, xKey, title, caption, height = 210, drillDown }: AnimatedBarChartProps) {
+  const [activeDrillKey, setActiveDrillKey] = useState<string | null>(null);
+  
+  const currentData = activeDrillKey && drillDown && drillDown[activeDrillKey] ? drillDown[activeDrillKey] : data;
+  const hasBudget = currentData.some((d) => 'budget' in d || 'target' in d);
+  const budgetKey = currentData[0] && 'budget' in currentData[0] ? 'budget' : 'target';
+
+  const handleBarClick = (entry: any) => {
+    // Recharts passes the original object in entry, or sometimes inside entry.payload
+    const key = entry[xKey] || (entry.payload && entry.payload[xKey]);
+    if (key && drillDown && drillDown[key]) {
+      setActiveDrillKey(key);
+    }
+  };
 
   return (
     <motion.div
@@ -53,12 +67,35 @@ export default function AnimatedBarChart({ data, dataKey, xKey, title, caption, 
       transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
       style={{ width: '100%', display: 'flex', flexDirection: 'column', height: height === -1 ? '100%' : undefined }}
     >
-      <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8, flexShrink: 0 }}>{title}</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexShrink: 0 }}>
+        <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>
+          {activeDrillKey ? `${title} (${activeDrillKey})` : title}
+        </p>
+        <AnimatePresence>
+          {activeDrillKey && (
+            <motion.button
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              onClick={() => setActiveDrillKey(null)}
+              style={{
+                background: 'var(--surface-2)', border: '1px solid var(--border-medium)',
+                borderRadius: 6, padding: '2px 8px', fontSize: 10, fontWeight: 600,
+                color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-3)'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-2)'; }}
+            >
+              <ArrowLeft size={10} /> Back
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
       <div style={{ flex: 1, minHeight: 0 }}>
       <ResponsiveContainer width="100%" height={height === -1 ? '100%' : height}>
-        <BarChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 4 }} barGap={4}>
+        <BarChart data={currentData} margin={{ top: 4, right: 8, left: 0, bottom: 4 }} barGap={4}>
           <defs>
-            {data.map((_, i) => (
+            {currentData.map((_, i) => (
               <linearGradient key={i} id={`barGrad-${i}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={GRADIENT_COLORS[i % GRADIENT_COLORS.length][1]} />
                 <stop offset="100%" stopColor={GRADIENT_COLORS[i % GRADIENT_COLORS.length][0]} />
@@ -93,9 +130,14 @@ export default function AnimatedBarChart({ data, dataKey, xKey, title, caption, 
             animationDuration={1400}
             animationEasing="ease-out"
             barSize={hasBudget ? 14 : 22}
+            onClick={handleBarClick}
           >
-            {data.map((_, i) => (
-              <Cell key={i} fill={`url(#barGrad-${i})`} />
+            {currentData.map((entry, i) => (
+              <Cell 
+                key={i} 
+                fill={`url(#barGrad-${i})`} 
+                cursor={drillDown && drillDown[entry[xKey] as string] ? 'pointer' : 'default'} 
+              />
             ))}
           </Bar>
         </BarChart>

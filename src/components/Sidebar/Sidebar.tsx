@@ -91,39 +91,62 @@ export default function Sidebar({ isOpen, onToggle, sessions, onSessionClick }: 
                   }}>
                     {group.label}
                   </div>
-                  {group.sessions.map((session) => (
-                    <motion.button
-                      key={session.id}
-                      onClick={() => {
-                        onSessionClick(MOCK_RESULTS[session.resultId]);
-                      }}
-                      initial={{ backgroundColor: 'rgba(255,255,255,0)' }}
-                      whileHover={{ backgroundColor: 'rgba(255,255,255,0.12)' }}
-                      transition={{ duration: 0.2 }}
-                      style={{
-                        width: '100%',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: '8px 16px',
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: 8,
-                        textAlign: 'left',
-                        borderRadius: 0,
-                      }}
-                    >
-                      <MessageSquare size={13} color="var(--text-muted)" style={{ marginTop: 2, flexShrink: 0 }} />
-                      <div>
-                        <p style={{ fontSize: 13, fontWeight: 500, color: '#e2e8f0', lineHeight: 1.4, marginBottom: 2 }}>
-                          {session.query.length > 38 ? session.query.slice(0, 38) + '…' : session.query}
-                        </p>
-                        <p style={{ fontSize: 10, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <Clock size={10} />
-                          {session.timestamp}
-                        </p>
-                      </div>
-                    </motion.button>
-                  ))}
+                  {group.sessions.map((session, idx) => {
+                    const isFollowUp = session.isFollowUp;
+                    const isLastChild = idx === group.sessions.length - 1 || group.sessions[idx + 1].sessionThreadId !== session.sessionThreadId;
+                    
+                    return (
+                      <motion.button
+                        key={session.id}
+                        onClick={() => {
+                          onSessionClick(MOCK_RESULTS[session.resultId]);
+                        }}
+                        initial={{ backgroundColor: 'rgba(255,255,255,0)' }}
+                        whileHover={{ backgroundColor: 'rgba(255,255,255,0.12)' }}
+                        transition={{ duration: 0.2 }}
+                        style={{
+                          width: '100%',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: `8px 16px 8px ${isFollowUp ? '32px' : '16px'}`,
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: 8,
+                          textAlign: 'left',
+                          borderRadius: 0,
+                          position: 'relative',
+                        }}
+                      >
+                        {isFollowUp && (
+                          <div style={{
+                            position: 'absolute',
+                            left: 18,
+                            top: -10,
+                            bottom: isLastChild ? 'auto' : -10,
+                            height: isLastChild ? 24 : '100%',
+                            width: 10,
+                            borderLeft: '1px solid rgba(255,255,255,0.2)',
+                            borderBottom: isLastChild ? '1px solid rgba(255,255,255,0.2)' : 'none',
+                            borderBottomLeftRadius: isLastChild ? 6 : 0,
+                          }} />
+                        )}
+                        {!isFollowUp ? (
+                          <MessageSquare size={13} color="var(--text-muted)" style={{ marginTop: 2, flexShrink: 0 }} />
+                        ) : (
+                          <div style={{ width: 13, flexShrink: 0 }} />
+                        )}
+                        <div>
+                          <p style={{ fontSize: 13, fontWeight: 500, color: isFollowUp ? '#94a3b8' : '#e2e8f0', lineHeight: 1.4, marginBottom: 2 }}>
+                            {session.query.length > 38 ? session.query.slice(0, 38) + '…' : session.query}
+                          </p>
+                          <p style={{ fontSize: 10, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <Clock size={10} />
+                            {session.timestamp}
+                          </p>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
                 </div>
               ))}
             </motion.div>
