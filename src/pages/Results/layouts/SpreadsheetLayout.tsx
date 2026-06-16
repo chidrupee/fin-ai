@@ -41,8 +41,8 @@ export default function SpreadsheetLayout({ result }: { result: QueryResult }) {
   };
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--canvas-bg)' }}>
-      <div style={{ flex: 1, overflow: 'auto', padding: '16px 20px' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--canvas-bg)' }}>
+      <div style={{ padding: '16px 20px' }}>
         <div style={{ background: 'var(--surface-1)', borderRadius: 12, border: '1px solid var(--border-light)', overflow: 'hidden', boxShadow: '0 2px 12px rgba(10,22,40,0.06)' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, fontFamily: 'Inter, sans-serif' }}>
             <thead>

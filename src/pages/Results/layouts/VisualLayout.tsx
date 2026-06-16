@@ -8,7 +8,7 @@ export default function VisualLayout({ result, isCompareMode }: { result: QueryR
   const [summaryOpen, setSummaryOpen] = useState(false);
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--canvas-bg)' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--canvas-bg)' }}>
       {/* Compact summary accordion */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
@@ -18,6 +18,9 @@ export default function VisualLayout({ result, isCompareMode }: { result: QueryR
           background: 'var(--surface-1)',
           borderBottom: '1px solid var(--border-light)',
           flexShrink: 0,
+          position: 'sticky',
+          top: 45, // height of FiltersBar
+          zIndex: 30,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px' }}>
@@ -100,7 +103,6 @@ export default function VisualLayout({ result, isCompareMode }: { result: QueryR
         gridTemplateColumns: result.charts.length > 1 && !isCompareMode ? '1fr 1fr' : '1fr',
         gridAutoRows: 'minmax(280px, 1fr)',
         gap: 14, padding: 16,
-        overflowY: 'auto',
       }}>
         {result.charts.map((chart, i) => {
           // If it's an odd number of charts and this is the last one, span full width

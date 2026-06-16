@@ -1,11 +1,13 @@
-import { Bell, User, Zap } from 'lucide-react';
+import { Bell, User, Zap, Sun, Moon } from 'lucide-react';
 
 interface TopBarProps {
   query?: string;
   isResultsView?: boolean;
+  isDark?: boolean;
+  onToggleDark?: () => void;
 }
 
-export default function TopBar({ query, isResultsView }: TopBarProps) {
+export default function TopBar({ query, isResultsView, isDark, onToggleDark }: TopBarProps) {
   return (
     <header style={{
       height: 56,
@@ -82,6 +84,27 @@ export default function TopBar({ query, isResultsView }: TopBarProps) {
         }}>
           EXECUTIVE
         </div>
+        {/* Dark mode toggle */}
+        <button
+          onClick={onToggleDark}
+          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          style={{
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 8,
+            cursor: 'pointer',
+            color: isDark ? '#f59e0b' : 'var(--text-muted)',
+            padding: '5px 7px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.2s',
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.12)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; }}
+        >
+          {isDark ? <Sun size={15} /> : <Moon size={15} />}
+        </button>
         <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}>
           <Bell size={16} />
         </button>

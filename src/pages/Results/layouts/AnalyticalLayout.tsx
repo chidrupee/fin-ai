@@ -6,7 +6,7 @@ import NarrativePane from '../../../components/NarrativePane/NarrativePane';
 
 export default function AnalyticalLayout({ result, isCompareMode }: { result: QueryResult; isCompareMode?: boolean }) {
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: isCompareMode ? 'column' : 'row', overflowY: isCompareMode ? 'auto' : 'hidden' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: isCompareMode ? 'column' : 'row' }}>
       {/* LEFT: Narrative (wider) */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
@@ -20,7 +20,11 @@ export default function AnalyticalLayout({ result, isCompareMode }: { result: Qu
           borderBottom: isCompareMode ? '1px solid var(--border-light)' : 'none',
           background: 'var(--surface-1)',
           padding: '18px 22px',
-          display: 'flex', flexDirection: 'column', overflow: isCompareMode ? 'visible' : 'hidden',
+          display: 'flex', flexDirection: 'column',
+          position: 'sticky',
+          top: 45,
+          zIndex: 30,
+          alignSelf: 'flex-start',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, flexShrink: 0 }}>
@@ -47,7 +51,7 @@ export default function AnalyticalLayout({ result, isCompareMode }: { result: Qu
           background: 'var(--canvas-bg)',
           padding: '18px 20px',
           display: 'flex', flexDirection: 'column',
-          gap: 14, overflowY: isCompareMode ? 'visible' : 'auto', overflowX: 'hidden',
+          gap: 14,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>

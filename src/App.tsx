@@ -26,6 +26,7 @@ export default function App() {
   const [state, setState] = useState<AppState>(INITIAL_STATE);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
   const handleQuery = (query: string, mode: StrategyMode, pinnedIds: string[]) => {
     setIsLoading(true);
@@ -91,7 +92,7 @@ export default function App() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', position: 'relative' }}>
+    <div data-theme={isDark ? 'dark' : undefined} style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', position: 'relative' }}>
       <AnimatedBackground />
 
       {/* Sidebar */}
@@ -107,6 +108,8 @@ export default function App() {
         <TopBar
           query={state.currentQuery}
           isResultsView={state.view === 'results'}
+          isDark={isDark}
+          onToggleDark={() => setIsDark(d => !d)}
         />
 
         {/* Loading overlay */}

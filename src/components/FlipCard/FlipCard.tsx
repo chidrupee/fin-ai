@@ -58,7 +58,7 @@ export default function FlipCard({ kpi, delay = 0 }: FlipCardProps) {
         <div style={{
           position: 'absolute', inset: 0,
           backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
-          background: '#ffffff',
+          background: 'var(--surface-1)',
           border: '1px solid var(--border-light)',
           borderRadius: 14,
           boxShadow: '0 2px 12px rgba(10,22,40,0.07)',
@@ -81,7 +81,7 @@ export default function FlipCard({ kpi, delay = 0 }: FlipCardProps) {
           position: 'absolute', inset: 0,
           backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
           transform: 'rotateY(180deg)',
-          background: `linear-gradient(135deg, ${healthColor}12, #fff)`,
+          background: `linear-gradient(135deg, ${healthColor}12, var(--surface-1))`,
           border: `1px solid ${healthColor}30`,
           borderRadius: 14,
           boxShadow: '0 2px 12px rgba(10,22,40,0.07)',

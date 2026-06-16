@@ -53,25 +53,31 @@ export default function Results({ result, onBack, onNewQuery, onCompare, isCompa
         />
       )}
 
-      {/* KPI deck only for visual/analytical */}
-      {(result.mode === 'visual' || result.mode === 'analytical' || result.mode === 'spreadsheet') && (
-        <KPIDeck kpis={result.kpis} />
-      )}
+      {/* SCROLLING CONTAINER */}
+      <div id="results-scroll-container" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        
+        {/* KPI deck only for visual/analytical */}
+        {(result.mode === 'visual' || result.mode === 'analytical' || result.mode === 'spreadsheet') && (
+          <KPIDeck kpis={result.kpis} />
+        )}
 
-      {/* Mode router */}
-      {result.mode === 'chat' ? (
-        <ChatLayout result={result} onNewQuery={onNewQuery} />
-      ) : result.mode === 'spreadsheet' ? (
-        <SpreadsheetLayout result={result} />
-      ) : (
-        <>
-          <FiltersBar activeFilters={activeFilters} onToggleFilter={toggleFilter} />
-          {filteredResult.mode === 'analytical'
-            ? <AnalyticalLayout result={filteredResult} isCompareMode={isCompareMode} />
-            : <VisualLayout result={filteredResult} />
-          }
-        </>
-      )}
+        {/* Mode router */}
+        {result.mode === 'chat' ? (
+          <ChatLayout result={result} onNewQuery={onNewQuery} />
+        ) : result.mode === 'spreadsheet' ? (
+          <SpreadsheetLayout result={result} />
+        ) : (
+          <>
+            <div style={{ position: 'sticky', top: 0, zIndex: 40 }}>
+              <FiltersBar activeFilters={activeFilters} onToggleFilter={toggleFilter} />
+            </div>
+            {filteredResult.mode === 'analytical'
+              ? <AnalyticalLayout result={filteredResult} isCompareMode={isCompareMode} />
+              : <VisualLayout result={filteredResult} isCompareMode={isCompareMode} />
+            }
+          </>
+        )}
+      </div>
 
       {!isCompareMode && <ShareButton />}
     </div>
