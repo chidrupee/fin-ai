@@ -9,7 +9,7 @@ interface Particle {
   opacity: number;
 }
 
-export default function AnimatedBackground() {
+export default function AnimatedBackground({ isDark }: { isDark?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function AnimatedBackground() {
     resize();
     window.addEventListener('resize', resize);
 
-    // Subtle light particles — small navy/red dots
+    // Subtle light particles — small dots
     const particles: Particle[] = Array.from({ length: 120 }, () => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
@@ -37,16 +37,17 @@ export default function AnimatedBackground() {
 
     // Soft gradient blob anchors
     const blobs = [
-      { x: window.innerWidth * 0.15, y: window.innerHeight * 0.2, r: 320, color: 'rgba(30,58,110,0.07)', vx: 0.15, vy: 0.1 },
-      { x: window.innerWidth * 0.8,  y: window.innerHeight * 0.7, r: 280, color: 'rgba(192,57,43,0.06)', vx: -0.12, vy: 0.08 },
-      { x: window.innerWidth * 0.5,  y: window.innerHeight * 0.4, r: 200, color: 'rgba(30,58,110,0.05)', vx: 0.08, vy: -0.1 },
+      { x: window.innerWidth * 0.15, y: window.innerHeight * 0.2, r: 320, color: isDark ? 'rgba(59,130,246,0.04)' : 'rgba(30,58,110,0.07)', vx: 0.15, vy: 0.1 },
+      { x: window.innerWidth * 0.8,  y: window.innerHeight * 0.7, r: 280, color: isDark ? 'rgba(239,68,68,0.03)' : 'rgba(192,57,43,0.06)', vx: -0.12, vy: 0.08 },
+      { x: window.innerWidth * 0.5,  y: window.innerHeight * 0.4, r: 200, color: isDark ? 'rgba(59,130,246,0.03)' : 'rgba(30,58,110,0.05)', vx: 0.08, vy: -0.1 },
     ];
+
+    const particleRGB = isDark ? '255, 255, 255' : '30, 58, 138';
 
     let raf: number;
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Light canvas base — let CSS handle the actual bg color
       // Draw soft blobs
       blobs.forEach((b) => {
         const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
@@ -66,7 +67,7 @@ export default function AnimatedBackground() {
       particles.forEach((p) => {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(30, 58, 138, ${p.opacity})`;
+        ctx.fillStyle = `rgba(${particleRGB}, ${p.opacity * (isDark ? 0.9 : 1)})`;
         ctx.fill();
         p.x += p.vx;
         p.y += p.vy;
@@ -82,7 +83,7 @@ export default function AnimatedBackground() {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 150) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(30, 58, 138, ${0.18 * (1 - dist / 150)})`;
+            ctx.strokeStyle = `rgba(${particleRGB}, ${0.25 * (1 - dist / 150) * (isDark ? 0.9 : 1)})`;
             ctx.lineWidth = 0.8;
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
@@ -99,7 +100,7 @@ export default function AnimatedBackground() {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
     };
-  }, []);
+  }, [isDark]);
 
   return (
     <canvas

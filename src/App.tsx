@@ -92,8 +92,8 @@ export default function App() {
   };
 
   return (
-    <div data-theme={isDark ? 'dark' : undefined} style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', position: 'relative' }}>
-      <AnimatedBackground />
+    <div data-theme={isDark ? 'dark' : undefined} style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', position: 'relative', background: 'var(--canvas-bg)', color: 'var(--text-primary)', transition: 'background 0.3s ease' }}>
+      <AnimatedBackground isDark={isDark} />
 
       {/* Sidebar */}
       <Sidebar
@@ -128,7 +128,7 @@ export default function App() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'rgba(244,246,250,0.92)',
+                background: isDark ? 'rgba(17,34,64,0.92)' : 'rgba(244,246,250,0.92)',
                 backdropFilter: 'blur(12px)',
               }}
             >
