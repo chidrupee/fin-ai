@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
 import { motion } from 'framer-motion';
-import { Search, MessageCircle, Table2, BarChart2, Brain, ChevronRight } from 'lucide-react';
+import { Search, MessageCircle, Table2, BarChart2, Brain } from 'lucide-react';
 import type { StrategyMode } from '../../types';
 import RippleButton from '../../components/RippleButton/RippleButton';
 import PinList from '../../components/PinList/PinList';

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { BarChart2, ChevronDown, ChevronUp } from 'lucide-react';
 import type { QueryResult } from '../../../types';
 import ChartRenderer from '../components/ChartRenderer';

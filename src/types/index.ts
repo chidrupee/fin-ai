@@ -5,7 +5,7 @@ export type StrategyMode = 'analytical' | 'visual' | 'chat' | 'spreadsheet';
 export type DataDomain = {
   id: string;
   name: string;
-  department: 'HR' | 'Technology' | 'Services' | 'Finance';
+  department: 'HR' | 'Technology' | 'Services' | 'Finance' | 'Sales' | 'Enterprise';
   description: string;
 };
 
