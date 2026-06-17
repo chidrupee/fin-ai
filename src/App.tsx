@@ -26,7 +26,7 @@ export default function App() {
   const [state, setState] = useState<AppState>(INITIAL_STATE);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
 
   const handleQuery = (query: string, mode: StrategyMode, pinnedIds: string[]) => {
     setIsLoading(true);
