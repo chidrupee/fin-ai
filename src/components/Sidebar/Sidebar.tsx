@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, ChevronLeft, ChevronRight, Clock, Sparkles } from 'lucide-react';
+import { MessageSquare, ChevronLeft, ChevronRight, Clock, Sparkles, Columns } from 'lucide-react';
 import type { QueryResult, SessionGroup } from '../../types';
 import { MOCK_RESULTS } from '../../data/mockData';
 
@@ -8,9 +8,10 @@ interface SidebarProps {
   onToggle: () => void;
   sessions: SessionGroup[];
   onSessionClick: (result: QueryResult) => void;
+  onSessionCompare: (result: QueryResult) => void;
 }
 
-export default function Sidebar({ isOpen, onToggle, sessions, onSessionClick }: SidebarProps) {
+export default function Sidebar({ isOpen, onToggle, sessions, onSessionClick, onSessionCompare }: SidebarProps) {
   return (
     <motion.aside
       animate={{ width: isOpen ? 260 : 56 }}
@@ -63,7 +64,7 @@ export default function Sidebar({ isOpen, onToggle, sessions, onSessionClick }: 
                 letterSpacing: '-0.01em',
               }}
             >
-              FinAI Executive
+              Constellation <span style={{ fontSize: 9, opacity: 0.6, fontWeight: 500 }}>by FinAI</span>
             </motion.span>
           )}
         </AnimatePresence>
@@ -135,14 +136,31 @@ export default function Sidebar({ isOpen, onToggle, sessions, onSessionClick }: 
                         ) : (
                           <div style={{ width: 13, flexShrink: 0 }} />
                         )}
-                        <div>
-                          <p style={{ fontSize: 13, fontWeight: 500, color: isFollowUp ? '#94a3b8' : '#e2e8f0', lineHeight: 1.4, marginBottom: 2 }}>
-                            {session.query.length > 38 ? session.query.slice(0, 38) + '…' : session.query}
+                        <div style={{ flex: 1, minWidth: 0, paddingRight: 8 }}>
+                          <p style={{ fontSize: 13, fontWeight: 500, color: isFollowUp ? '#94a3b8' : '#e2e8f0', lineHeight: 1.4, marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {session.query}
                           </p>
                           <p style={{ fontSize: 10, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
                             <Clock size={10} />
                             {session.timestamp}
                           </p>
+                        </div>
+                        <div
+                          className="compare-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSessionCompare(MOCK_RESULTS[session.resultId]);
+                          }}
+                          style={{
+                            background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: 6, padding: 4, cursor: 'pointer', color: 'var(--sidebar-secondary)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', flexShrink: 0
+                          }}
+                          title="Open in Compare Mode"
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.15)'; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.05)'; }}
+                        >
+                          <Columns size={12} />
                         </div>
                       </motion.button>
                     );

@@ -31,7 +31,8 @@ export default function PinList({ domains, pinnedIds, onTogglePin }: PinListProp
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '8px 12px', marginBottom: 4, borderRadius: 8,
+        padding: '6px 10px', borderRadius: 8,
+        width: 'calc(20% - 7px)', minWidth: 140,
         border: `1px solid ${isPinned ? 'rgba(192,57,43,0.3)' : 'var(--border-light)'}`,
         background: isPinned ? 'rgba(192,57,43,0.05)' : 'var(--surface-2)',
         transition: 'border-color 0.2s',
@@ -105,17 +106,19 @@ export default function PinList({ domains, pinnedIds, onTogglePin }: PinListProp
           >
             <div style={{ padding: 10 }}>
               {pinned.length > 0 && (
-                <div style={{ marginBottom: 8 }}>
-                  <p style={{ fontSize: 9, fontWeight: 700, color: '#c0392b', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6, paddingLeft: 4 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, width: '100%', marginBottom: 8 }}>
+                  <p style={{ fontSize: 9, fontWeight: 700, color: '#c0392b', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: -2, paddingLeft: 4, width: '100%' }}>
                     ↑ Pinned
                   </p>
                   <AnimatePresence>{pinned.map((item) => renderItem(item, true))}</AnimatePresence>
                 </div>
               )}
-              <div>
-                <p style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6, paddingLeft: 4 }}>
-                  Available
-                </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {pinned.length === 0 && (
+                  <p style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', width: '100%', marginBottom: -2, paddingLeft: 4 }}>
+                    Available Sources
+                  </p>
+                )}
                 <AnimatePresence>{unpinned.map((item) => renderItem(item, false))}</AnimatePresence>
               </div>
             </div>

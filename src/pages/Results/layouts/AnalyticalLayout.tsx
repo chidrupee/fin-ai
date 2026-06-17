@@ -6,7 +6,7 @@ import NarrativePane from '../../../components/NarrativePane/NarrativePane';
 
 export default function AnalyticalLayout({ result, isCompareMode }: { result: QueryResult; isCompareMode?: boolean }) {
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: isCompareMode ? 'column' : 'row' }}>
+    <div className="print-wrap" style={{ flex: 1, display: 'flex', flexDirection: isCompareMode ? 'column' : 'row' }}>
       {/* LEFT: Narrative (wider) */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
@@ -25,6 +25,8 @@ export default function AnalyticalLayout({ result, isCompareMode }: { result: Qu
           top: 45,
           zIndex: 30,
           alignSelf: 'flex-start',
+          maxHeight: isCompareMode ? 'none' : 'calc(100vh - 120px)',
+          overflowY: isCompareMode ? 'visible' : 'auto',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, flexShrink: 0 }}>
@@ -65,6 +67,7 @@ export default function AnalyticalLayout({ result, isCompareMode }: { result: Qu
         {result.charts.map((chart, i) => (
           <motion.div
             key={i}
+            className="chart-container"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35 + i * 0.12, duration: 0.4 }}
@@ -74,7 +77,7 @@ export default function AnalyticalLayout({ result, isCompareMode }: { result: Qu
               borderRadius: 12, padding: '14px 16px',
               boxShadow: '0 1px 6px rgba(10,22,40,0.05)',
               display: 'flex', flexDirection: 'column',
-              flexShrink: 0,
+              flexShrink: 0, minWidth: 0,
             }}
           >
             <ChartRenderer chart={chart} height={180} />

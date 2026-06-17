@@ -27,6 +27,17 @@
     --text-secondary: #2e4270;
     --text-muted: #7a8db5;
 
+    /* Chart Gradients - Light */
+    --chart-bar-1-start: #1e3a6e;
+    --chart-bar-1-end: #c0392b;
+    --chart-bar-2-start: #162d56;
+    --chart-bar-2-end: #9b2226;
+    --chart-bar-3-start: #0f2040;
+    --chart-bar-3-end: #7b1a1a;
+    --chart-green-start: #10b981;
+    --chart-green-end: #065f46;
+    --chart-grid: rgba(10, 22, 40, 0.06);
+
     /* Buttons */
     --gradient-button: linear-gradient(135deg, #1e3a6e 0%, #7b1a1a 60%, #c0392b 100%);
     --gradient-button-hover: linear-gradient(135deg, #162d56 0%, #9b2226 60%, #e74c3c 100%);
@@ -56,6 +67,17 @@
     --text-primary: #e6edf3;
     --text-secondary: #b0bec5;
     --text-muted: #6e7f8d;
+
+    /* Chart Gradients - Dark */
+    --chart-bar-1-start: #3b82f6;
+    --chart-bar-1-end: #ff7b72;
+    --chart-bar-2-start: #60a5fa;
+    --chart-bar-2-end: #f87171;
+    --chart-bar-3-start: #2563eb;
+    --chart-bar-3-end: #ef4444;
+    --chart-green-start: #34d399;
+    --chart-green-end: #10b981;
+    --chart-grid: rgba(255, 255, 255, 0.08);
 
     /* Scrollbar */
     scrollbar-color: rgba(255,255,255,0.12) transparent;
@@ -165,4 +187,42 @@
 .mermaid .edgeLabel {
   background: #fff !important;
   color: #2e4270 !important;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  /* Reset themes */
+  body, #root, [data-theme="dark"] {
+    background: white !important;
+    color: black !important;
+  }
+  
+  /* Reset container constraints */
+  html, body, #root, [style*="overflow"], [style*="max-height"] {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    position: static !important;
+  }
+
+  /* Force KPIDeck and similar flex rows to wrap */
+  .print-wrap, [style*="overflowX: auto"], [style*="overflow-x: auto"] {
+    flex-wrap: wrap !important;
+    overflow: visible !important;
+  }
+
+  .print-force-show {
+    height: auto !important;
+    opacity: 1 !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+
+  /* Prevent page breaks inside charts/cards */
+  .chart-container, .recharts-wrapper {
+    page-break-inside: avoid !important;
+  }
 }

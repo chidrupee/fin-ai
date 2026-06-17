@@ -18,11 +18,9 @@ interface AnimatedBarChartProps {
 }
 
 const GRADIENT_COLORS = [
-  ['#1e3a6e', '#c0392b'],
-  ['#162d56', '#9b2226'],
-  ['#0f2040', '#7b1a1a'],
-  ['#1a3360', '#a93226'],
-  ['#0d1d3b', '#922b21'],
+  ['var(--chart-bar-1-start)', 'var(--chart-bar-1-end)'],
+  ['var(--chart-bar-2-start)', 'var(--chart-bar-2-end)'],
+  ['var(--chart-bar-3-start)', 'var(--chart-bar-3-end)'],
 ];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -106,7 +104,7 @@ export default function AnimatedBarChart({ data, dataKey, xKey, title, caption, 
               <stop offset="100%" stopColor="rgba(255,255,255,0.06)" />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(10,22,40,0.06)" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
           <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} width={36} />
           <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />

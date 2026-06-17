@@ -77,7 +77,7 @@ export default function FlipCard({ kpi, delay = 0 }: FlipCardProps) {
         </div>
 
         {/* Back */}
-        <div style={{
+        <div className="no-print" style={{
           position: 'absolute', inset: 0,
           backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
           transform: 'rotateY(180deg)',

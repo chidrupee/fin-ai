@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Download } from 'lucide-react';
 import type { QueryResult } from '../../../types';
 
 export default function SpreadsheetLayout({ result }: { result: QueryResult }) {
@@ -40,9 +40,41 @@ export default function SpreadsheetLayout({ result }: { result: QueryResult }) {
     return { bg: 'transparent', color: 'var(--text-muted)', border: 'transparent' };
   };
 
+  const handleExportCSV = () => {
+    if (!sd) return;
+    const header = sd.columns.map(c => `"${c.label}"`).join(',');
+    const rows = sd.rows.map(r => sd.columns.map(c => `"${r[c.key]}"`).join(','));
+    if (sd.summaryRow) {
+      rows.push(sd.columns.map(c => `"${sd.summaryRow![c.key] || ''}"`).join(','));
+    }
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'novametrics_export.csv';
+    a.click();
+  };
+
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--canvas-bg)' }}>
       <div style={{ padding: '16px 20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+          <button 
+            onClick={handleExportCSV} 
+            className="no-print"
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: 6, background: 'var(--surface-2)', 
+              border: '1px solid var(--border-medium)', padding: '6px 12px', borderRadius: 6, 
+              cursor: 'pointer', color: 'var(--text-primary)', fontSize: 12, fontWeight: 600,
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-3)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-2)'; }}
+          >
+            <Download size={14} /> Export to CSV
+          </button>
+        </div>
         <div style={{ background: 'var(--surface-1)', borderRadius: 12, border: '1px solid var(--border-light)', overflow: 'hidden', boxShadow: '0 2px 12px rgba(10,22,40,0.06)' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, fontFamily: 'Inter, sans-serif' }}>
             <thead>

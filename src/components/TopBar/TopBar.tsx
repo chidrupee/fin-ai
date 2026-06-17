@@ -36,7 +36,7 @@ export default function TopBar({ query, isResultsView, isDark, onToggleDark }: T
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <Zap size={16} style={{ color: '#e74c3c' }} />
         <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-          FinAI
+          Constellation <span style={{ fontSize: 9, opacity: 0.6, fontWeight: 500, textTransform: 'none', marginLeft: 4 }}>powered by FinAI</span>
         </span>
       </div>
 

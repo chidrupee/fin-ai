@@ -61,10 +61,11 @@ const EXAMPLE_QUESTIONS = [
 
 export default function Landing({ onSubmit }: LandingProps) {
   const [query, setQuery] = useState('');
+  const [selectedMode, setSelectedMode] = useState<StrategyMode>('visual');
   const [pinnedIds, setPinnedIds] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (q = query, mode: StrategyMode = 'visual') => {
+  const handleSubmit = (q = query, mode: StrategyMode = selectedMode) => {
     if (!q.trim()) return;
     onSubmit(q.trim(), mode, pinnedIds);
   };
@@ -94,21 +95,83 @@ export default function Landing({ onSubmit }: LandingProps) {
         <p style={{ fontSize: 30, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.25, marginBottom: 10 }}>
           Ask anything about your{' '}
           <span style={{ background: 'var(--gradient-button)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-            business
+            business performance
           </span>
         </p>
-        <p style={{ fontSize: 14, color: 'var(--text-muted)', maxWidth: 440, lineHeight: 1.6, margin: '0 auto' }}>
-          Get instant answers from your HR, Finance, and Operations data — in the format that works best for you.
+        <p style={{ fontSize: 14, color: 'var(--text-muted)', maxWidth: 460, lineHeight: 1.6, margin: '0 auto' }}>
+          Turn data into instant insights, explore performance, identify drivers, and take actions with Constellation powered by FinAI.
         </p>
+      </motion.div>
+
+      {/* "See what Constellation can do" label */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.15, duration: 0.5 }}
+        style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: 14 }}
+      >
+        Choose Analysis Mode →
+      </motion.p>
+
+      {/* 4 mode selection cards */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, width: '100%', maxWidth: 800, marginBottom: 28 }}
+      >
+        {EXAMPLE_QUESTIONS.map((ex, i) => {
+          const Icon = ex.icon;
+          const isSelected = selectedMode === ex.mode;
+          return (
+            <motion.button
+              key={i}
+              onClick={() => setSelectedMode(ex.mode)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              style={{
+                background: isSelected ? ex.bg : 'var(--surface-1)',
+                border: `1.5px solid rgba(${ex.colorRgb}, ${isSelected ? '1' : '0.75'})`,
+                borderRadius: 14,
+                padding: '12px 14px',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 8,
+                textAlign: 'center',
+                transition: 'all 0.2s',
+                boxShadow: isSelected ? `0 4px 16px rgba(${ex.colorRgb}, 0.15)` : 'none',
+              }}
+            >
+              <div style={{
+                width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+                background: isSelected ? `rgba(${ex.colorRgb}, 0.12)` : 'var(--surface-2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Icon size={16} color={isSelected ? ex.color : 'var(--text-muted)'} />
+              </div>
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 700, color: isSelected ? ex.color : 'var(--text-primary)', letterSpacing: '0.02em', marginBottom: 4 }}>
+                  {ex.label}
+                </p>
+                <p style={{ fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                  {ex.sublabel}
+                </p>
+              </div>
+            </motion.button>
+          );
+        })}
       </motion.div>
 
       {/* Search bar */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15, duration: 0.5 }}
-        style={{ width: '100%', maxWidth: 680, marginBottom: 28 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        style={{ width: '100%', maxWidth: 800, marginBottom: 16 }}
       >
+
         <div style={{
           display: 'flex', alignItems: 'center',
           background: 'var(--surface-1)',
@@ -135,88 +198,55 @@ export default function Landing({ onSubmit }: LandingProps) {
             id="analyze-button"
             size="md"
             onClick={() => handleSubmit()}
-            disabled={!query.trim()}
-            style={{ flexShrink: 0, opacity: query.trim() ? 1 : 0.45 }}
+            style={{ flexShrink: 0 }}
           >
-            Ask FinAI
+            Ask Constellation
           </RippleButton>
         </div>
       </motion.div>
 
-      {/* "See what FinAI can do" label */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-        style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: 14 }}
-      >
-        See what FinAI can do →
-      </motion.p>
-
-      {/* 4 example question cards */}
+      {/* Example Prompts */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, width: '100%', maxWidth: 680, marginBottom: 28 }}
+        transition={{ delay: 0.35, duration: 0.5 }}
+        style={{ width: '100%', maxWidth: 800, marginBottom: 28, display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}
       >
-        {EXAMPLE_QUESTIONS.map((ex, i) => {
-          const Icon = ex.icon;
-          return (
-            <motion.button
-              key={i}
-              onClick={() => handleSubmit(ex.query, ex.mode)}
-              whileHover={{ scale: 1.02, boxShadow: '0 6px 24px rgba(10,22,40,0.10)' }}
-              whileTap={{ scale: 0.98 }}
-              style={{
-                background: ex.bg,
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
-                border: `1px solid ${ex.border}`,
-                borderRadius: 14,
-                padding: '14px 16px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 12,
-                textAlign: 'left',
-                transition: 'all 0.2s',
-              }}
-            >
-              <div style={{
-                width: 34, height: 34, borderRadius: 10, flexShrink: 0,
-                background: `rgba(${ex.colorRgb}, 0.12)`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Icon size={16} color={ex.color} />
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: ex.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                    {ex.label}
-                  </p>
-                </div>
-                <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', lineHeight: 1.4, marginBottom: 4 }}>
-                  {ex.query}
-                </p>
-                <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4, display: 'flex', alignItems: 'center', gap: 4 }}>
-                  {ex.sublabel} <ChevronRight size={10} />
-                </p>
-              </div>
-            </motion.button>
-          );
-        })}
+        {EXAMPLE_QUESTIONS.map((ex, i) => (
+          <button
+            key={i}
+            onClick={() => {
+              setQuery(ex.query);
+              setSelectedMode(ex.mode);
+            }}
+            style={{
+              background: `rgba(${ex.colorRgb}, 0.03)`, border: `1.5px solid rgba(${ex.colorRgb}, 0.5)`,
+              padding: '6px 12px', borderRadius: 16, fontSize: 11.5, color: 'var(--text-secondary)',
+              cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'Inter, sans-serif'
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = `rgba(${ex.colorRgb}, 0.12)`;
+              (e.currentTarget as HTMLButtonElement).style.borderColor = ex.color;
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = `rgba(${ex.colorRgb}, 0.03)`;
+              (e.currentTarget as HTMLButtonElement).style.borderColor = `rgba(${ex.colorRgb}, 0.5)`;
+            }}
+          >
+            {ex.query}
+          </button>
+        ))}
       </motion.div>
 
       {/* Data Sources */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.55, duration: 0.5 }}
-        style={{ width: '100%', maxWidth: 680 }}
+        transition={{ delay: 0.45, duration: 0.5 }}
+        style={{ width: '100%', maxWidth: 800 }}
       >
         <PinList
-          domains={DATA_DOMAINS}
+          domains={DATA_DOMAINS.slice(0, 5)}
           pinnedIds={pinnedIds}
           onTogglePin={(id) => setPinnedIds((prev) =>
             prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]

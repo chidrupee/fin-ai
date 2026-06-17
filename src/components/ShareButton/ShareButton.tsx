@@ -11,7 +11,7 @@ export default function ShareButton() {
   ];
 
   return (
-    <div style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 50 }}>
+    <div className="no-print" style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 50 }}>
       <AnimatePresence>
         {open && (
           <motion.div

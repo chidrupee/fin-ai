@@ -81,19 +81,19 @@ export default function AnimatedWaterfallChart({ data, title, caption, height = 
           <ComposedChart data={wfData} margin={{ top: 4, right: 8, left: 0, bottom: 4 }} barSize={18}>
             <defs>
               <linearGradient id="wfGradBase" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8} />
-                <stop offset="100%" stopColor="#1e3a6e" stopOpacity={0.8} />
+                <stop offset="0%" stopColor="var(--chart-bar-1-start)" stopOpacity={0.8} />
+                <stop offset="100%" stopColor="var(--chart-bar-1-end)" stopOpacity={0.8} />
               </linearGradient>
               <linearGradient id="wfGradRed" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#e74c3c" stopOpacity={0.9} />
-                <stop offset="100%" stopColor="#7b1a1a" stopOpacity={0.9} />
+                <stop offset="0%" stopColor="var(--chart-bar-3-end)" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="var(--chart-bar-3-start)" stopOpacity={0.9} />
               </linearGradient>
               <linearGradient id="wfGradGreen" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#10b981" stopOpacity={0.85} />
-                <stop offset="100%" stopColor="#065f46" stopOpacity={0.85} />
+                <stop offset="0%" stopColor="var(--chart-green-start)" stopOpacity={0.85} />
+                <stop offset="100%" stopColor="var(--chart-green-end)" stopOpacity={0.85} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(10,22,40,0.06)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
             <XAxis dataKey="category" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} width={36} />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(10,22,40,0.03)' }} />

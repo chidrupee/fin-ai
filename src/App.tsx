@@ -91,26 +91,40 @@ export default function App() {
     }));
   };
 
+  const handleSessionCompare = (result: QueryResult) => {
+    setState((prev) => ({
+      ...prev,
+      view: 'compare',
+      compareLeft: prev.currentResult || prev.compareLeft || result,
+      compareRight: result,
+    }));
+  };
+
   return (
     <div data-theme={isDark ? 'dark' : undefined} style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', position: 'relative', background: 'var(--canvas-bg)', color: 'var(--text-primary)', transition: 'background 0.3s ease' }}>
       <AnimatedBackground isDark={isDark} />
 
       {/* Sidebar */}
-      <Sidebar
-        isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
-        sessions={state.sessionHistory}
-        onSessionClick={handleSessionClick}
-      />
+      <div className="no-print" style={{ display: 'flex', zIndex: 20 }}>
+        <Sidebar
+          isOpen={sidebarOpen}
+          onToggle={() => setSidebarOpen(!sidebarOpen)}
+          sessions={state.sessionHistory}
+          onSessionClick={handleSessionClick}
+          onSessionCompare={handleSessionCompare}
+        />
+      </div>
 
       {/* Main content */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
-        <TopBar
-          query={state.currentQuery}
-          isResultsView={state.view === 'results'}
-          isDark={isDark}
-          onToggleDark={() => setIsDark(d => !d)}
-        />
+        <div className="no-print">
+          <TopBar
+            query={state.currentQuery}
+            isResultsView={state.view === 'results'}
+            isDark={isDark}
+            onToggleDark={() => setIsDark(d => !d)}
+          />
+        </div>
 
         {/* Loading overlay */}
         <AnimatePresence>
@@ -134,21 +148,18 @@ export default function App() {
             >
               <div style={{ position: 'relative', marginBottom: 24 }}>
                 {[0, 1, 2].map((i) => (
-                  <motion.div
-                    key={i}
-                    animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0, 0.6] }}
-                    transition={{ duration: 1.8, delay: i * 0.35, repeat: Infinity, ease: 'easeInOut' }}
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      border: '2px solid #c0392b',
-                    }}
-                  />
+                  <div key={i} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                    <motion.div
+                      animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0, 0.6] }}
+                      transition={{ duration: 1.8, delay: i * 0.35, repeat: Infinity, ease: 'easeInOut' }}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        border: '2px solid #c0392b',
+                      }}
+                    />
+                  </div>
                 ))}
                 <div style={{
                   width: 40,

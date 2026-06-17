@@ -5,6 +5,7 @@ import FlipCard from '../../../components/FlipCard/FlipCard';
 export default function KPIDeck({ kpis }: { kpis: QueryResult['kpis'] }) {
   return (
     <motion.div
+      className="print-wrap"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, delay: 0.08 }}

@@ -47,15 +47,13 @@ export default function VisualLayout({ result, isCompareMode }: { result: QueryR
           </motion.button>
         </div>
 
-        <AnimatePresence>
-          {summaryOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              style={{ overflow: 'hidden' }}
-            >
+        <motion.div
+          initial={false}
+          animate={{ height: summaryOpen ? 'auto' : 0, opacity: summaryOpen ? 1 : 0 }}
+          transition={{ duration: 0.25 }}
+          style={{ overflow: 'hidden' }}
+          className="print-force-show"
+        >
               <div style={{ padding: '0 20px 20px', display: 'flex', gap: 24, flexDirection: isCompareMode ? 'column' : 'row' }}>
                 <div style={{ flex: 1, minWidth: 0, background: 'var(--canvas-bg)', padding: 16, borderRadius: 12, border: '1px solid var(--border-light)' }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: '#c0392b', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>Key Findings</p>
@@ -92,15 +90,13 @@ export default function VisualLayout({ result, isCompareMode }: { result: QueryR
                   ))}
                 </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </motion.div>
       </motion.div>
 
       {/* Charts grid — allows scrolling if there are many charts */}
       <div style={{
         flex: 1, display: 'grid',
-        gridTemplateColumns: result.charts.length > 1 && !isCompareMode ? '1fr 1fr' : '1fr',
+        gridTemplateColumns: result.charts.length > 1 && !isCompareMode ? 'minmax(0, 1fr) minmax(0, 1fr)' : 'minmax(0, 1fr)',
         gridAutoRows: 'minmax(280px, 1fr)',
         gap: 14, padding: 16,
       }}>
@@ -110,6 +106,7 @@ export default function VisualLayout({ result, isCompareMode }: { result: QueryR
           return (
             <motion.div
               key={i}
+              className="chart-container"
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.18 + i * 0.1, duration: 0.45 }}
@@ -120,7 +117,7 @@ export default function VisualLayout({ result, isCompareMode }: { result: QueryR
                 borderRadius: 14, padding: '14px 16px',
                 boxShadow: '0 1px 8px rgba(10,22,40,0.05)',
                 display: 'flex', flexDirection: 'column', overflow: 'hidden',
-                minHeight: 280,
+                minHeight: 280, minWidth: 0,
               }}
             >
               <ChartRenderer chart={chart} height={-1} />

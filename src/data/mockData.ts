@@ -3,11 +3,11 @@ import type { DataDomain, QueryResult, SessionGroup, SessionEntry } from '../typ
 // ── Data Domains ─────────────────────────────────────────────────────────────
 
 export const DATA_DOMAINS: DataDomain[] = [
-  { id: 'hr-global', name: 'HR Global Metrics', department: 'HR', description: 'Headcount, attrition, compensation' },
-  { id: 'hr-apac', name: 'HR APAC', department: 'HR', description: 'Asia-Pacific workforce data' },
-  { id: 'tech-cloud', name: 'Cloud Infrastructure', department: 'Technology', description: 'AWS / Azure spend & utilization' },
-  { id: 'tech-saas', name: 'SaaS Portfolio', department: 'Technology', description: 'Software license costs & usage' },
-  { id: 'svc-margins', name: 'Service Margins', department: 'Services', description: 'Professional services P&L' },
+  { id: 'hr-global', name: 'Headcount and cost', department: 'HR', description: 'Headcount, attrition, compensation' },
+  { id: 'hr-apac', name: 'Segment profitability', department: 'Finance', description: 'Regional margins and profitability' },
+  { id: 'tech-cloud', name: 'Commercials', department: 'Sales', description: 'Pricing, win rates, ARR' },
+  { id: 'tech-saas', name: 'Technology', department: 'Technology', description: 'Infrastructure and software spend' },
+  { id: 'svc-margins', name: 'Vodafone Business', department: 'Enterprise', description: 'Key account metrics' },
   { id: 'svc-delivery', name: 'Delivery KPIs', department: 'Services', description: 'SLA, CSAT, utilization rates' },
   { id: 'fin-q3', name: 'Q3 Finance Report', department: 'Finance', description: 'Consolidated quarterly financials' },
   { id: 'fin-forecast', name: 'FY26 Forecast', department: 'Finance', description: 'Annual budget vs actuals' },
