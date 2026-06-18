@@ -70,7 +70,12 @@ export default function Results({ result, onBack, onNewQuery, onCompare, isCompa
         ) : (
           <>
             <div style={{ position: 'sticky', top: 0, zIndex: 40 }}>
-              <FiltersBar activeFilters={activeFilters} onToggleFilter={toggleFilter} />
+              <FiltersBar 
+                activeFilters={activeFilters} 
+                onToggleFilter={toggleFilter} 
+                recommendedPrompts={result.recommendedPrompts}
+                onNewQuery={onNewQuery}
+              />
             </div>
             {filteredResult.mode === 'analytical'
               ? <AnalyticalLayout result={filteredResult} isCompareMode={isCompareMode} />
@@ -79,50 +84,6 @@ export default function Results({ result, onBack, onNewQuery, onCompare, isCompa
           </>
         )}
 
-        {/* Suggested Next Steps */}
-        {result.recommendedPrompts && result.recommendedPrompts.length > 0 && (
-          <div className="no-print" style={{ 
-            padding: '16px 20px', flexShrink: 0, zIndex: 10, alignSelf: 'flex-start'
-          }}>
-            <div style={{
-              background: 'var(--surface-1)', border: '1px solid var(--border-light)',
-              borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column',
-              boxShadow: '0 2px 12px rgba(10,22,40,0.05)',
-            }}>
-              <p style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8, textAlign: 'left' }}>
-                Suggested Next Steps
-              </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-start' }}>
-                {result.recommendedPrompts.map((prompt) => (
-                  <button
-                    key={prompt.id}
-                    onClick={() => onNewQuery(prompt.query)}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 6,
-                      background: 'var(--surface-2)', border: '1px solid var(--border-medium)',
-                      padding: '5px 10px', borderRadius: 6, cursor: 'pointer',
-                      color: 'var(--text-primary)', fontSize: 11, fontWeight: 500,
-                      transition: 'all 0.2s',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'var(--surface-3)';
-                      e.currentTarget.style.borderColor = 'var(--text-secondary)';
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'var(--surface-2)';
-                      e.currentTarget.style.borderColor = 'var(--border-medium)';
-                      e.currentTarget.style.transform = 'none';
-                    }}
-                  >
-                    {prompt.label}
-                    <ArrowRight size={12} color="var(--text-muted)" />
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {!isCompareMode && <ShareButton />}

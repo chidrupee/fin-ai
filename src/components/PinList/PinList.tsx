@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Pin, PinOff, ChevronDown, ChevronUp } from 'lucide-react';
+import { Pin, PinOff } from 'lucide-react';
 import type { DataDomain } from '../../types';
 
 interface PinListProps {
@@ -17,7 +16,6 @@ const DEPT_COLORS: Record<string, string> = {
 };
 
 export default function PinList({ domains, pinnedIds, onTogglePin }: PinListProps) {
-  const [expanded, setExpanded] = useState(true);
   const pinned = domains.filter((d) => pinnedIds.includes(d.id));
   const unpinned = domains.filter((d) => !pinnedIds.includes(d.id));
 
@@ -61,70 +59,16 @@ export default function PinList({ domains, pinnedIds, onTogglePin }: PinListProp
   );
 
   return (
-    <div style={{
-      background: 'var(--surface-1)',
-      border: '1px solid var(--border-light)',
-      borderRadius: 12,
-      overflow: 'hidden',
-      boxShadow: '0 1px 8px rgba(10,22,40,0.06)',
-      width: '100%',
-    }}>
-      <button
-        onClick={() => setExpanded(!expanded)}
-        style={{
-          width: '100%', background: 'none', border: 'none', cursor: 'pointer',
-          padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          borderBottom: `1px solid var(--border-light)`,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-            Data Context
-          </span>
-          {pinnedIds.length > 0 && (
-            <span style={{
-              fontSize: 10, fontWeight: 700,
-              background: 'var(--gradient-button)', color: '#fff',
-              borderRadius: 10, padding: '1px 7px',
-            }}>
-              {pinnedIds.length} pinned
-            </span>
-          )}
-        </div>
-        {expanded ? <ChevronUp size={13} color="var(--text-muted)" /> : <ChevronDown size={13} color="var(--text-muted)" />}
-      </button>
-
-      <AnimatePresence initial={false}>
-        {expanded && (
-          <motion.div
-            key="content"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-            style={{ overflow: 'hidden' }}
-          >
-            <div style={{ padding: 10 }}>
-              {pinned.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, width: '100%', marginBottom: 8 }}>
-                  <p style={{ fontSize: 9, fontWeight: 700, color: '#c0392b', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: -2, paddingLeft: 4, width: '100%' }}>
-                    ↑ Pinned
-                  </p>
-                  <AnimatePresence>{pinned.map((item) => renderItem(item, true))}</AnimatePresence>
-                </div>
-              )}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {pinned.length === 0 && (
-                  <p style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', width: '100%', marginBottom: -2, paddingLeft: 4 }}>
-                    Available Sources
-                  </p>
-                )}
-                <AnimatePresence>{unpinned.map((item) => renderItem(item, false))}</AnimatePresence>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', paddingLeft: 4 }}>
+        Data Context
+      </span>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, width: '100%' }}>
+        <AnimatePresence>
+          {pinned.map((item) => renderItem(item, true))}
+          {unpinned.map((item) => renderItem(item, false))}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

@@ -26,13 +26,13 @@ export default function AnimatedBackground({ isDark }: { isDark?: boolean }) {
     window.addEventListener('resize', resize);
 
     // Subtle light particles — small dots
-    const particles: Particle[] = Array.from({ length: 120 }, () => ({
+    const particles: Particle[] = Array.from({ length: 80 }, () => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
-      vx: (Math.random() - 0.5) * 0.35,
-      vy: (Math.random() - 0.5) * 0.35,
-      radius: Math.random() * 2.5 + 1.0,
-      opacity: Math.random() * 0.3 + 0.1,
+      vx: (Math.random() - 0.5) * 0.15,
+      vy: (Math.random() - 0.5) * 0.15,
+      radius: Math.random() * 1.5 + 0.5,
+      opacity: Math.random() * 0.2 + 0.1,
     }));
 
     // Soft gradient blob anchors
@@ -81,10 +81,10 @@ export default function AnimatedBackground({ isDark }: { isDark?: boolean }) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 150) {
+          if (dist < 180) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(${particleRGB}, ${0.25 * (1 - dist / 150) * (isDark ? 0.9 : 1)})`;
-            ctx.lineWidth = 0.8;
+            ctx.strokeStyle = `rgba(${particleRGB}, ${0.15 * (1 - dist / 180) * (isDark ? 0.9 : 1)})`;
+            ctx.lineWidth = 0.4;
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.stroke();

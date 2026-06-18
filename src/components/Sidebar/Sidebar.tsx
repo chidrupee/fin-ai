@@ -14,6 +14,7 @@ interface SidebarProps {
 export default function Sidebar({ isOpen, onToggle, sessions, onSessionClick, onSessionCompare }: SidebarProps) {
   return (
     <motion.aside
+      onClick={onToggle}
       animate={{ width: isOpen ? 260 : 56 }}
       transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
       style={{
@@ -185,7 +186,10 @@ export default function Sidebar({ isOpen, onToggle, sessions, onSessionClick, on
 
       {/* Toggle Button */}
       <button
-        onClick={onToggle}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle();
+        }}
         style={{
           margin: 12,
           padding: '8px',

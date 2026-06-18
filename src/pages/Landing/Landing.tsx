@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MessageCircle, Table2, BarChart2, Brain } from 'lucide-react';
 import type { StrategyMode } from '../../types';
 import RippleButton from '../../components/RippleButton/RippleButton';
@@ -61,12 +61,26 @@ const EXAMPLE_QUESTIONS = [
 
 export default function Landing({ onSubmit }: LandingProps) {
   const [query, setQuery] = useState('');
-  const [selectedMode, setSelectedMode] = useState<StrategyMode>('visual');
+  const [selectedMode, setSelectedMode] = useState<StrategyMode | null>(null);
   const [pinnedIds, setPinnedIds] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (q = query, mode: StrategyMode = selectedMode) => {
-    if (!q.trim()) return;
+  const hasQuery = query.trim().length > 0;
+  const hasMode = selectedMode !== null;
+  const hasContext = pinnedIds.length > 0;
+  const isActive = hasQuery || hasMode;
+
+  const isSubmitDisabled = !hasQuery || !hasMode || !hasContext;
+
+  let buttonText = 'Ask Constellation';
+  if (isActive) {
+    if (!hasMode) buttonText = 'Select Mode';
+    else if (!hasContext) buttonText = 'Select Data Context';
+    else if (!hasQuery) buttonText = 'Enter Question';
+  }
+
+  const handleSubmit = (q = query, mode: StrategyMode | null = selectedMode) => {
+    if (!q.trim() || !mode || pinnedIds.length === 0) return;
     onSubmit(q.trim(), mode, pinnedIds);
   };
 
@@ -79,11 +93,14 @@ export default function Landing({ onSubmit }: LandingProps) {
   };
 
   return (
-    <div style={{
-      flex: 1, display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'flex-start',
-      padding: '4vw 24px 40px', overflowY: 'auto', gap: 0,
-    }}>
+    <div 
+      onClick={() => setSelectedMode(null)}
+      style={{
+        flex: 1, display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'flex-start',
+        padding: '4vw 24px 40px', overflowY: 'auto', gap: 0,
+      }}
+    >
 
       {/* Hero */}
       <motion.div
@@ -91,6 +108,7 @@ export default function Landing({ onSubmit }: LandingProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55 }}
         style={{ textAlign: 'center', marginBottom: 36 }}
+        onClick={(e) => e.stopPropagation()}
       >
         <p style={{ fontSize: 30, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.25, marginBottom: 10 }}>
           Ask anything about your{' '}
@@ -103,63 +121,36 @@ export default function Landing({ onSubmit }: LandingProps) {
         </p>
       </motion.div>
 
-      {/* "See what Constellation can do" label */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.15, duration: 0.5 }}
-        style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: 14 }}
-      >
-        Choose Analysis Mode →
-      </motion.p>
-
-      {/* 4 mode selection cards */}
+      {/* Mode Toggles */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.5 }}
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, width: '100%', maxWidth: 800, marginBottom: 28 }}
+        style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24, background: 'var(--surface-1)', padding: 6, borderRadius: 12, border: '1px solid var(--border-light)', boxShadow: '0 2px 12px rgba(10,22,40,0.03)' }}
+        onClick={(e) => e.stopPropagation()}
       >
         {EXAMPLE_QUESTIONS.map((ex, i) => {
           const Icon = ex.icon;
           const isSelected = selectedMode === ex.mode;
           return (
-            <motion.button
+            <button
               key={i}
-              onClick={() => setSelectedMode(ex.mode)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              onClick={() => setSelectedMode(isSelected ? null : ex.mode)}
               style={{
-                background: isSelected ? ex.bg : 'var(--surface-1)',
-                border: `1.5px solid rgba(${ex.colorRgb}, ${isSelected ? '1' : '0.75'})`,
-                borderRadius: 14,
-                padding: '12px 14px',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 8,
-                textAlign: 'center',
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '8px 16px', borderRadius: 8, cursor: 'pointer',
+                background: isSelected ? `rgba(${ex.colorRgb}, 0.12)` : 'transparent',
+                border: isSelected ? `1px solid rgba(${ex.colorRgb}, 0.3)` : '1px solid transparent',
                 transition: 'all 0.2s',
-                boxShadow: isSelected ? `0 4px 16px rgba(${ex.colorRgb}, 0.15)` : 'none',
               }}
+              onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-2)' }}
+              onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
             >
-              <div style={{
-                width: 34, height: 34, borderRadius: 10, flexShrink: 0,
-                background: isSelected ? `rgba(${ex.colorRgb}, 0.12)` : 'var(--surface-2)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Icon size={16} color={isSelected ? ex.color : 'var(--text-muted)'} />
-              </div>
-              <div>
-                <p style={{ fontSize: 12, fontWeight: 700, color: isSelected ? ex.color : 'var(--text-primary)', letterSpacing: '0.02em', marginBottom: 4 }}>
-                  {ex.label}
-                </p>
-                <p style={{ fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                  {ex.sublabel}
-                </p>
-              </div>
-            </motion.button>
+              <Icon size={14} color={isSelected ? ex.color : 'var(--text-muted)'} />
+              <span style={{ fontSize: 12, fontWeight: 600, color: isSelected ? ex.color : 'var(--text-muted)' }}>
+                {ex.label}
+              </span>
+            </button>
           );
         })}
       </motion.div>
@@ -170,6 +161,7 @@ export default function Landing({ onSubmit }: LandingProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.5 }}
         style={{ width: '100%', maxWidth: 800, marginBottom: 16 }}
+        onClick={(e) => e.stopPropagation()}
       >
 
         <div style={{
@@ -198,61 +190,75 @@ export default function Landing({ onSubmit }: LandingProps) {
             id="analyze-button"
             size="md"
             onClick={() => handleSubmit()}
-            style={{ flexShrink: 0 }}
+            style={{ flexShrink: 0, opacity: isSubmitDisabled ? 0.6 : 1, cursor: isSubmitDisabled ? 'not-allowed' : 'pointer' }}
           >
-            Ask Constellation
+            {buttonText}
           </RippleButton>
         </div>
       </motion.div>
 
-      {/* Example Prompts */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35, duration: 0.5 }}
-        style={{ width: '100%', maxWidth: 800, marginBottom: 28, display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}
-      >
-        {EXAMPLE_QUESTIONS.map((ex, i) => (
-          <button
-            key={i}
-            onClick={() => {
-              setQuery(ex.query);
-              setSelectedMode(ex.mode);
-            }}
-            style={{
-              background: `rgba(${ex.colorRgb}, 0.03)`, border: `1.5px solid rgba(${ex.colorRgb}, 0.5)`,
-              padding: '6px 12px', borderRadius: 16, fontSize: 11.5, color: 'var(--text-secondary)',
-              cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'Inter, sans-serif'
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLButtonElement).style.background = `rgba(${ex.colorRgb}, 0.12)`;
-              (e.currentTarget as HTMLButtonElement).style.borderColor = ex.color;
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLButtonElement).style.background = `rgba(${ex.colorRgb}, 0.03)`;
-              (e.currentTarget as HTMLButtonElement).style.borderColor = `rgba(${ex.colorRgb}, 0.5)`;
-            }}
+      {/* Data Sources (Context) */}
+      <AnimatePresence>
+        {isActive && (
+          <motion.div
+            key="data-context"
+            initial={{ opacity: 0, y: 10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -10, height: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{ width: '100%', maxWidth: 800, marginBottom: 28, overflow: 'hidden' }}
+            onClick={(e) => e.stopPropagation()}
           >
-            {ex.query}
-          </button>
-        ))}
-      </motion.div>
+            <PinList
+              domains={DATA_DOMAINS.slice(0, 5)}
+              pinnedIds={pinnedIds}
+              onTogglePin={(id) => setPinnedIds((prev) =>
+                prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+              )}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Data Sources */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.45, duration: 0.5 }}
-        style={{ width: '100%', maxWidth: 800 }}
-      >
-        <PinList
-          domains={DATA_DOMAINS.slice(0, 5)}
-          pinnedIds={pinnedIds}
-          onTogglePin={(id) => setPinnedIds((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-          )}
-        />
-      </motion.div>
+      {/* Example Prompts (Suggested Questions) */}
+      <AnimatePresence>
+        {!isActive && (
+          <motion.div
+            key="suggested-questions"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10, height: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            style={{ width: '100%', maxWidth: 800, display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', overflow: 'hidden' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {EXAMPLE_QUESTIONS.map((ex, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setQuery(ex.query);
+                  setSelectedMode(ex.mode);
+                }}
+                style={{
+                  background: `rgba(${ex.colorRgb}, 0.03)`, border: `1.5px solid rgba(${ex.colorRgb}, 0.5)`,
+                  padding: '6px 12px', borderRadius: 16, fontSize: 11.5, color: 'var(--text-secondary)',
+                  cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'Inter, sans-serif'
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLButtonElement).style.background = `rgba(${ex.colorRgb}, 0.12)`;
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = ex.color;
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLButtonElement).style.background = `rgba(${ex.colorRgb}, 0.03)`;
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = `rgba(${ex.colorRgb}, 0.5)`;
+                }}
+              >
+                {ex.query}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
