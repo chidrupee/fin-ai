@@ -69,12 +69,12 @@
     --text-muted: #6e7f8d;
 
     /* Chart Gradients - Dark */
-    --chart-bar-1-start: #3b82f6;
-    --chart-bar-1-end: #ff7b72;
-    --chart-bar-2-start: #60a5fa;
-    --chart-bar-2-end: #f87171;
-    --chart-bar-3-start: #2563eb;
-    --chart-bar-3-end: #ef4444;
+    --chart-bar-1-start: #1e3a6e;
+    --chart-bar-1-end: #c0392b;
+    --chart-bar-2-start: #2a4678;
+    --chart-bar-2-end: #9b2226;
+    --chart-bar-3-start: #3b82f6;
+    --chart-bar-3-end: #e74c3c;
     --chart-green-start: #34d399;
     --chart-green-end: #10b981;
     --chart-grid: rgba(255, 255, 255, 0.08);

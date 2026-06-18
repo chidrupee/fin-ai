@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { ArrowRight } from 'lucide-react';
 import type { QueryResult, StrategyMode } from '../../types';
 import ShareButton from '../../components/ShareButton/ShareButton';
 
@@ -23,19 +22,41 @@ interface ResultsProps {
 }
 
 export default function Results({ result, onBack, onNewQuery, onCompare, isCompareMode }: ResultsProps) {
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [activeFilters, setActiveFilters] = useState<Record<string, string>>({
+    Region: 'All',
+    Department: 'All',
+    Timeframe: 'Q3'
+  });
 
-  const toggleFilter = (filter: string) => {
-    setActiveFilters(prev => prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]);
+  const handleFilterChange = (key: string, value: string) => {
+    setActiveFilters(prev => ({ ...prev, [key]: value }));
   };
 
   const filteredResult = useMemo(() => {
     let displayCharts = result.charts;
     if (result.mode === 'analytical') displayCharts = displayCharts.slice(0, 2);
-    if (activeFilters.length > 0) {
+    
+    // Count how many filters differ from their defaults
+    const activeCount = Object.entries(activeFilters).filter(([k, v]) => {
+      if (k === 'Timeframe') return v !== 'Q3';
+      return v !== 'All';
+    }).length;
+
+    if (activeCount > 0) {
+      // Simulate filtering by proportionally scaling down the data values
+      // rather than slicing the array (which looks like a drill-down/category removal)
+      const multiplier = Math.pow(0.75, activeCount);
       displayCharts = displayCharts.map(c => ({
         ...c,
-        data: c.data.slice(0, Math.max(2, c.data.length - 1))
+        data: c.data.map(d => {
+          const newD = { ...d };
+          Object.keys(newD).forEach(k => {
+            if (typeof newD[k] === 'number') {
+              newD[k] = Number((newD[k] * multiplier).toFixed(1));
+            }
+          });
+          return newD;
+        })
       }));
     }
     return { ...result, charts: displayCharts };
@@ -72,7 +93,7 @@ export default function Results({ result, onBack, onNewQuery, onCompare, isCompa
             <div style={{ position: 'sticky', top: 0, zIndex: 40 }}>
               <FiltersBar 
                 activeFilters={activeFilters} 
-                onToggleFilter={toggleFilter} 
+                onFilterChange={handleFilterChange} 
                 recommendedPrompts={result.recommendedPrompts}
                 onNewQuery={onNewQuery}
               />

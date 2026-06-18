@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, ChevronLeft, ChevronRight, Clock, Sparkles, Columns } from 'lucide-react';
+import { MessageSquare, ChevronLeft, ChevronRight, Clock, Sparkles, Columns, Home } from 'lucide-react';
 import type { QueryResult, SessionGroup } from '../../types';
 import { MOCK_RESULTS } from '../../data/mockData';
 
@@ -9,9 +9,10 @@ interface SidebarProps {
   sessions: SessionGroup[];
   onSessionClick: (result: QueryResult) => void;
   onSessionCompare: (result: QueryResult) => void;
+  onHome: () => void;
 }
 
-export default function Sidebar({ isOpen, onToggle, sessions, onSessionClick, onSessionCompare }: SidebarProps) {
+export default function Sidebar({ isOpen, onToggle, sessions, onSessionClick, onSessionCompare, onHome }: SidebarProps) {
   return (
     <motion.aside
       onClick={onToggle}
@@ -69,6 +70,51 @@ export default function Sidebar({ isOpen, onToggle, sessions, onSessionClick, on
             </motion.span>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* Home Action */}
+      <div style={{ padding: '16px 12px 0' }}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onHome();
+          }}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            padding: '10px 12px',
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 8,
+            cursor: 'pointer',
+            color: 'var(--text-primary)',
+            transition: 'all 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.08)';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)';
+          }}
+        >
+          <div style={{ width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Home size={16} />
+          </div>
+          <AnimatePresence>
+            {isOpen && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                style={{ fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}
+              >
+                Home
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
       </div>
 
       {/* Session History */}

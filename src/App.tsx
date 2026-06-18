@@ -112,6 +112,7 @@ export default function App() {
           sessions={state.sessionHistory}
           onSessionClick={handleSessionClick}
           onSessionCompare={handleSessionCompare}
+          onHome={handleBack}
         />
       </div>
 

@@ -59,6 +59,23 @@ export const MOCK_RESULTS: Record<string, QueryResult> = {
           { dept: 'Product', cost: 18.6, budget: 17.2 },
           { dept: 'G&A', cost: 9.4, budget: 10.3 },
         ],
+        drillDown: {
+          'Engineering': [
+            { dept: 'Platform', cost: 22.1, budget: 18.0 },
+            { dept: 'Data & AI', cost: 18.4, budget: 12.5 },
+            { dept: 'Security', cost: 10.2, budget: 8.0 },
+            { dept: 'Core App', cost: 7.7, budget: 6.0 },
+          ],
+          'Sales': [
+            { dept: 'Enterprise', cost: 15.2, budget: 14.0 },
+            { dept: 'Mid-Market', cost: 10.4, budget: 10.0 },
+            { dept: 'SMB', cost: 5.6, budget: 6.0 },
+          ],
+          'Services': [
+            { dept: 'Consulting', cost: 12.4, budget: 13.0 },
+            { dept: 'Support', cost: 12.4, budget: 13.0 },
+          ]
+        }
       },
       {
         type: 'waterfall', title: 'Q3 vs Q2 Cost Bridge ($M)', caption: 'The waterfall clearly shows merit increases and new hires as the dominant cost add, partially offset by attrition savings.',

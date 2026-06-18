@@ -13,7 +13,7 @@ interface AnimatedPieChartProps {
   height?: number;
 }
 
-const COLORS = ['#1e3a6e', '#c0392b', '#10b981', '#f59e0b', '#8b5cf6', '#0ea5e9'];
+const COLORS = ['#3b82f6', '#c0392b', '#10b981', '#f59e0b', '#8b5cf6', '#0ea5e9'];
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null;
@@ -70,7 +70,8 @@ export default function AnimatedPieChart({ data, dataKey, nameKey, title, captio
               height={36} 
               iconType="circle" 
               iconSize={8}
-              wrapperStyle={{ fontSize: 10, color: 'var(--text-muted)' }}
+              formatter={(value) => <span style={{ color: 'var(--text-secondary)' }}>{value}</span>}
+              wrapperStyle={{ fontSize: 10 }}
             />
           </PieChart>
         </ResponsiveContainer>
