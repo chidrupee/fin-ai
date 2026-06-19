@@ -13,6 +13,7 @@ interface FiltersBarProps {
   onFilterChange: (key: string, value: string) => void;
   recommendedPrompts?: RecommendedPrompt[];
   onNewQuery?: (query: string) => void;
+  isCompareMode?: boolean;
 }
 
 const FILTER_OPTIONS: Record<string, string[]> = {
@@ -21,7 +22,7 @@ const FILTER_OPTIONS: Record<string, string[]> = {
   Timeframe: ['Q3', 'Q2', 'Q1', 'FY2026'],
 };
 
-export default function FiltersBar({ activeFilters, onFilterChange, recommendedPrompts, onNewQuery }: FiltersBarProps) {
+export default function FiltersBar({ activeFilters, onFilterChange, recommendedPrompts, onNewQuery, isCompareMode }: FiltersBarProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   // Close dropdown when clicking outside
@@ -36,14 +37,15 @@ export default function FiltersBar({ activeFilters, onFilterChange, recommendedP
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.15 }}
+      className="no-print"
       style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '10px 20px', borderBottom: '1px solid var(--border-light)',
-        background: 'var(--surface-1)', flexShrink: 0,
+        display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between',
+        padding: isCompareMode ? '8px 12px' : '10px 20px', borderBottom: '1px solid var(--border-light)',
+        background: 'var(--surface-1)', flexShrink: 0, gap: '8px 12px',
       }}
     >
       {/* Left: Filters */}
-      <div style={{ display: 'flex', gap: 12 }}>
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         {Object.entries(FILTER_OPTIONS).map(([filterKey, options]) => {
           const currentValue = activeFilters[filterKey] || options[0];
           const isDefault = filterKey === 'Timeframe' ? currentValue === 'Q3' : currentValue === 'All';

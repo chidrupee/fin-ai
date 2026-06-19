@@ -6,22 +6,23 @@ import type { KPICard } from '../../types';
 interface FlipCardProps {
   kpi: KPICard;
   delay?: number;
+  isCompareMode?: boolean;
 }
 
 const SPARKLINE_W = 96;
 const SPARKLINE_H = 32;
 
-function Sparkline({ data, color }: { data: number[]; color: string }) {
+function Sparkline({ data, color, width = SPARKLINE_W, height = SPARKLINE_H }: { data: number[]; color: string; width?: number; height?: number }) {
   const min = Math.min(...data);
   const max = Math.max(...data);
   const range = max - min || 1;
   const pts = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * SPARKLINE_W;
-    const y = SPARKLINE_H - ((v - min) / range) * (SPARKLINE_H - 4) - 2;
+    const x = (i / (data.length - 1)) * width;
+    const y = height - ((v - min) / range) * (height - 4) - 2;
     return `${x},${y}`;
   });
   return (
-    <svg width={SPARKLINE_W} height={SPARKLINE_H} style={{ overflow: 'visible' }}>
+    <svg width={width} height={height} style={{ overflow: 'visible' }}>
       <polyline
         points={pts.join(' ')}
         fill="none"
@@ -34,7 +35,7 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
   );
 }
 
-export default function FlipCard({ kpi, delay = 0 }: FlipCardProps) {
+export default function FlipCard({ kpi, delay = 0, isCompareMode = false }: FlipCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const healthColor = { green: '#10b981', red: '#e74c3c', amber: '#f59e0b' }[kpi.health];
   const TrendIcon = kpi.trendDirection === 'up' ? TrendingUp : kpi.trendDirection === 'down' ? TrendingDown : Minus;
@@ -44,7 +45,14 @@ export default function FlipCard({ kpi, delay = 0 }: FlipCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-      style={{ perspective: 1000, flex: 1, minWidth: 140, height: 130, cursor: 'pointer', flexShrink: 1 }}
+      style={{ 
+        perspective: 1000, 
+        flex: 1, 
+        minWidth: isCompareMode ? 120 : 140, 
+        height: isCompareMode ? 115 : 130, 
+        cursor: 'pointer', 
+        flexShrink: 1 
+      }}
       onMouseEnter={() => setIsFlipped(true)}
       onMouseLeave={() => setIsFlipped(false)}
       onClick={() => setIsFlipped(!isFlipped)}
@@ -62,17 +70,32 @@ export default function FlipCard({ kpi, delay = 0 }: FlipCardProps) {
           border: '1px solid var(--border-light)',
           borderRadius: 14,
           boxShadow: '0 2px 12px rgba(10,22,40,0.07)',
-          padding: '16px 18px',
+          padding: isCompareMode ? '12px 14px' : '16px 18px',
           display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
         }}>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 6, letterSpacing: '0.02em' }}>{kpi.title}</p>
-            <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1 }}>{kpi.value}</p>
+            <p style={{ 
+              fontSize: isCompareMode ? 10 : 11, 
+              fontWeight: 500, 
+              color: 'var(--text-muted)', 
+              marginBottom: isCompareMode ? 2 : 6, 
+              letterSpacing: '0.02em',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }} title={kpi.title}>{kpi.title}</p>
+            <p style={{ 
+              fontSize: isCompareMode ? 22 : 28, 
+              fontWeight: 800, 
+              color: 'var(--text-primary)', 
+              letterSpacing: '-0.03em', 
+              lineHeight: 1 
+            }}>{kpi.value}</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: isCompareMode ? '2px 4px' : '4px 6px', marginTop: 4 }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: healthColor, boxShadow: `0 0 6px ${healthColor}` }} />
-            <span style={{ fontSize: 11, fontWeight: 600, color: healthColor }}>{kpi.trend}</span>
-            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{kpi.subText}</span>
+            <span style={{ fontSize: isCompareMode ? 10 : 11, fontWeight: 600, color: healthColor }}>{kpi.trend}</span>
+            <span style={{ fontSize: isCompareMode ? 9 : 10, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: isCompareMode ? 65 : 'none' }}>{kpi.subText}</span>
           </div>
         </div>
 
@@ -85,19 +108,20 @@ export default function FlipCard({ kpi, delay = 0 }: FlipCardProps) {
           border: `1px solid ${healthColor}30`,
           borderRadius: 14,
           boxShadow: '0 2px 12px rgba(10,22,40,0.07)',
-          padding: '14px 18px',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
+          padding: isCompareMode ? '10px 12px' : '14px 18px',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: isCompareMode ? 4 : 8,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Activity size={13} color={healthColor} />
-            <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Trend</span>
+            <Activity size={isCompareMode ? 11 : 13} color={healthColor} />
+            <span style={{ fontSize: isCompareMode ? 9 : 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Trend</span>
           </div>
-          <Sparkline data={kpi.sparkline} color={healthColor} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <TrendIcon size={14} color={healthColor} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: healthColor }}>{kpi.trend} QoQ</span>
+          <div style={{ height: isCompareMode ? 24 : 'auto', display: 'flex', alignItems: 'center' }}>
+            <Sparkline data={kpi.sparkline} color={healthColor} width={isCompareMode ? 80 : 96} height={isCompareMode ? 24 : 32} />
           </div>
-          <span style={{ fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>{kpi.subText}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <TrendIcon size={isCompareMode ? 12 : 14} color={healthColor} />
+            <span style={{ fontSize: isCompareMode ? 11 : 13, fontWeight: 700, color: healthColor }}>{kpi.trend} QoQ</span>
+          </div>
         </div>
       </motion.div>
     </motion.div>

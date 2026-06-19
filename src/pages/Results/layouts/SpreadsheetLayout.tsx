@@ -40,20 +40,63 @@ export default function SpreadsheetLayout({ result }: { result: QueryResult }) {
     return { bg: 'transparent', color: 'var(--text-muted)', border: 'transparent' };
   };
 
-  const handleExportCSV = () => {
+  const handleExportExcel = () => {
     if (!sd) return;
-    const header = sd.columns.map(c => `"${c.label}"`).join(',');
-    const rows = sd.rows.map(r => sd.columns.map(c => `"${r[c.key]}"`).join(','));
+
+    const escapeXml = (str: string | number) => {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    };
+
+    const headerRow = `<Row>` + sd.columns.map(c => `<Cell><Data ss:Type="String">${escapeXml(c.label)}</Data></Cell>`).join('') + `</Row>`;
+
+    const rowsXml = sd.rows.map(r => {
+      return `<Row>` + sd.columns.map(c => {
+        const val = r[c.key];
+        const type = typeof val === 'number' ? 'Number' : 'String';
+        return `<Cell><Data ss:Type="${type}">${escapeXml(val)}</Data></Cell>`;
+      }).join('') + `</Row>`;
+    }).join('\n');
+
+    let summaryRowXml = '';
     if (sd.summaryRow) {
-      rows.push(sd.columns.map(c => `"${sd.summaryRow![c.key] || ''}"`).join(','));
+      summaryRowXml = `<Row>` + sd.columns.map(c => {
+        const val = sd.summaryRow![c.key];
+        if (val === undefined || val === '') {
+          return `<Cell><Data ss:Type="String"></Data></Cell>`;
+        }
+        const type = typeof val === 'number' ? 'Number' : 'String';
+        return `<Cell><Data ss:Type="${type}">${escapeXml(val)}</Data></Cell>`;
+      }).join('') + `</Row>`;
     }
-    const csv = [header, ...rows].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
+
+    const excelXml = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Worksheet ss:Name="Constellation Export">
+  <Table>
+    ${headerRow}
+    ${rowsXml}
+    ${summaryRowXml}
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+    const blob = new Blob([excelXml], { type: 'application/vnd.ms-excel' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'novametrics_export.csv';
+    a.download = 'constellation_export.xls';
     a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -61,7 +104,7 @@ export default function SpreadsheetLayout({ result }: { result: QueryResult }) {
       <div style={{ padding: '16px 20px' }}>
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
           <button 
-            onClick={handleExportCSV} 
+            onClick={handleExportExcel} 
             className="no-print"
             style={{ 
               display: 'flex', alignItems: 'center', gap: 6, background: 'var(--surface-2)', 
@@ -72,7 +115,7 @@ export default function SpreadsheetLayout({ result }: { result: QueryResult }) {
             onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-3)'; }}
             onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-2)'; }}
           >
-            <Download size={14} /> Export to CSV
+            <Download size={14} /> Export to Excel
           </button>
         </div>
         <div style={{ background: 'var(--surface-1)', borderRadius: 12, border: '1px solid var(--border-light)', overflow: 'hidden', boxShadow: '0 2px 12px rgba(10,22,40,0.06)' }}>

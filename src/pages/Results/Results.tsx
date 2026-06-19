@@ -80,7 +80,7 @@ export default function Results({ result, onBack, onNewQuery, onCompare, isCompa
         
         {/* KPI deck only for visual/analytical */}
         {(result.mode === 'visual' || result.mode === 'analytical' || result.mode === 'spreadsheet') && (
-          <KPIDeck kpis={result.kpis} />
+          <KPIDeck kpis={result.kpis} isCompareMode={isCompareMode} />
         )}
 
         {/* Mode router */}
@@ -94,8 +94,9 @@ export default function Results({ result, onBack, onNewQuery, onCompare, isCompa
               <FiltersBar 
                 activeFilters={activeFilters} 
                 onFilterChange={handleFilterChange} 
-                recommendedPrompts={result.recommendedPrompts}
+                recommendedPrompts={isCompareMode ? [] : result.recommendedPrompts}
                 onNewQuery={onNewQuery}
+                isCompareMode={isCompareMode}
               />
             </div>
             {filteredResult.mode === 'analytical'

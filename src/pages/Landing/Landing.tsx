@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MessageCircle, Table2, BarChart2, Brain } from 'lucide-react';
+import { Search, MessageCircle, Table2, BarChart2, Brain, X } from 'lucide-react';
 import type { StrategyMode } from '../../types';
 import RippleButton from '../../components/RippleButton/RippleButton';
 import PinList from '../../components/PinList/PinList';
@@ -63,29 +63,35 @@ export default function Landing({ onSubmit }: LandingProps) {
   const [query, setQuery] = useState('');
   const [selectedMode, setSelectedMode] = useState<StrategyMode | null>(null);
   const [pinnedIds, setPinnedIds] = useState<string[]>([]);
+  const [showContextPopup, setShowContextPopup] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const hasQuery = query.trim().length > 0;
   const hasMode = selectedMode !== null;
-  const hasContext = pinnedIds.length > 0;
   const isActive = hasQuery || hasMode;
 
-  const isSubmitDisabled = !hasQuery || !hasMode || !hasContext;
+  const isSubmitDisabled = !hasQuery || !hasMode;
 
   let buttonText = 'Ask Constellation';
   if (isActive) {
     if (!hasMode) buttonText = 'Select Mode';
-    else if (!hasContext) buttonText = 'Select Data Context';
     else if (!hasQuery) buttonText = 'Enter Question';
   }
 
-  const handleSubmit = (q = query, mode: StrategyMode | null = selectedMode) => {
-    if (!q.trim() || !mode || pinnedIds.length === 0) return;
-    onSubmit(q.trim(), mode, pinnedIds);
+  const handleStartSubmit = () => {
+    if (!query.trim() || !selectedMode) return;
+    setShowContextPopup(true);
+  };
+
+  const handleFinalSubmit = (skipContext: boolean) => {
+    if (!query.trim() || !selectedMode) return;
+    const finalContext = skipContext ? [] : pinnedIds;
+    onSubmit(query.trim(), selectedMode, finalContext);
+    setShowContextPopup(false);
   };
 
   const handleKey = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleSubmit();
+    if (e.key === 'Enter') handleStartSubmit();
     if (e.key === 'Tab' && !query) {
       e.preventDefault();
       setQuery('Show me regional revenue performance');
@@ -126,7 +132,14 @@ export default function Landing({ onSubmit }: LandingProps) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.5 }}
-        style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24, background: 'var(--surface-1)', padding: 6, borderRadius: 12, border: '1px solid var(--border-light)', boxShadow: '0 2px 12px rgba(10,22,40,0.03)' }}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 12,
+          width: '100%',
+          maxWidth: 800,
+          marginBottom: 24,
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {EXAMPLE_QUESTIONS.map((ex, i) => {
@@ -137,18 +150,45 @@ export default function Landing({ onSubmit }: LandingProps) {
               key={i}
               onClick={() => setSelectedMode(isSelected ? null : ex.mode)}
               style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                padding: '8px 16px', borderRadius: 8, cursor: 'pointer',
-                background: isSelected ? `rgba(${ex.colorRgb}, 0.12)` : 'transparent',
-                border: isSelected ? `1px solid rgba(${ex.colorRgb}, 0.3)` : '1px solid transparent',
-                transition: 'all 0.2s',
+                display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                padding: '14px 16px', borderRadius: 14, cursor: 'pointer',
+                background: isSelected ? `rgba(${ex.colorRgb}, 0.08)` : `rgba(${ex.colorRgb}, 0.02)`,
+                border: isSelected ? `2px solid ${ex.color}` : `1.5px solid rgba(${ex.colorRgb}, 0.16)`,
+                boxShadow: isSelected ? `0 4px 12px rgba(${ex.colorRgb}, 0.08)` : '0 2px 8px rgba(10,22,40,0.02)',
+                textAlign: 'left',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                position: 'relative',
               }}
-              onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-2)' }}
-              onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
+              onMouseEnter={e => {
+                if (!isSelected) {
+                  (e.currentTarget as HTMLButtonElement).style.background = `rgba(${ex.colorRgb}, 0.06)`;
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = `rgba(${ex.colorRgb}, 0.45)`;
+                  (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)';
+                }
+              }}
+              onMouseLeave={e => {
+                if (!isSelected) {
+                  (e.currentTarget as HTMLButtonElement).style.background = `rgba(${ex.colorRgb}, 0.02)`;
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = `rgba(${ex.colorRgb}, 0.16)`;
+                  (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
+                }
+              }}
             >
-              <Icon size={14} color={isSelected ? ex.color : 'var(--text-muted)'} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: isSelected ? ex.color : 'var(--text-muted)' }}>
-                {ex.label}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, width: '100%' }}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: 24, height: 24, borderRadius: 6,
+                  background: `rgba(${ex.colorRgb}, 0.15)`,
+                  transition: 'background 0.2s',
+                }}>
+                  <Icon size={14} color={ex.color} />
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 700, color: isSelected ? ex.color : 'var(--text-primary)' }}>
+                  {ex.label}
+                </span>
+              </div>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.45 }}>
+                {ex.sublabel}
               </span>
             </button>
           );
@@ -173,6 +213,45 @@ export default function Landing({ onSubmit }: LandingProps) {
           gap: 12,
         }}>
           <Search size={18} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+
+          {selectedMode && (
+            (() => {
+              const ex = EXAMPLE_QUESTIONS.find(x => x.mode === selectedMode);
+              if (!ex) return null;
+              const Icon = ex.icon;
+              return (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '4px 10px', borderRadius: 8,
+                  background: `rgba(${ex.colorRgb}, 0.1)`,
+                  border: `1px solid rgba(${ex.colorRgb}, 0.25)`,
+                  flexShrink: 0,
+                }}>
+                  <Icon size={12} color={ex.color} />
+                  <span style={{ fontSize: 11, fontWeight: 700, color: ex.color }}>
+                    {ex.label}
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedMode(null);
+                    }}
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      padding: 0, margin: 0, color: ex.color, opacity: 0.7,
+                      marginLeft: 2,
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.opacity = '1'; }}
+                    onMouseLeave={e => { e.currentTarget.style.opacity = '0.7'; }}
+                  >
+                    <X size={10} strokeWidth={3} />
+                  </button>
+                </div>
+              );
+            })()
+          )}
+
           <input
             ref={inputRef}
             id="main-search-input"
@@ -189,7 +268,7 @@ export default function Landing({ onSubmit }: LandingProps) {
           <RippleButton
             id="analyze-button"
             size="md"
-            onClick={() => handleSubmit()}
+            onClick={handleStartSubmit}
             style={{ flexShrink: 0, opacity: isSubmitDisabled ? 0.6 : 1, cursor: isSubmitDisabled ? 'not-allowed' : 'pointer' }}
           >
             {buttonText}
@@ -197,34 +276,10 @@ export default function Landing({ onSubmit }: LandingProps) {
         </div>
       </motion.div>
 
-      {/* Data Sources (Context) */}
-      <AnimatePresence>
-        {isActive && (
-          <motion.div
-            key="data-context"
-            initial={{ opacity: 0, y: 10, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: 'auto' }}
-            exit={{ opacity: 0, y: -10, height: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{ width: '100%', maxWidth: 800, marginBottom: 28, overflow: 'hidden' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <PinList
-              domains={DATA_DOMAINS.slice(0, 5)}
-              pinnedIds={pinnedIds}
-              onTogglePin={(id) => setPinnedIds((prev) =>
-                prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-              )}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Example Prompts (Suggested Questions) */}
       <AnimatePresence>
-        {!isActive && (
-          <motion.div
-            key="suggested-questions"
+        <motion.div
+          key="suggested-questions"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10, height: 0, scale: 0.95 }}
@@ -240,23 +295,157 @@ export default function Landing({ onSubmit }: LandingProps) {
                   setSelectedMode(ex.mode);
                 }}
                 style={{
-                  background: `rgba(${ex.colorRgb}, 0.03)`, border: `1.5px solid rgba(${ex.colorRgb}, 0.5)`,
-                  padding: '6px 12px', borderRadius: 16, fontSize: 11.5, color: 'var(--text-secondary)',
-                  cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'Inter, sans-serif'
+                  background: `rgba(${ex.colorRgb}, 0.05)`, 
+                  border: `1.5px solid rgba(${ex.colorRgb}, 0.35)`,
+                  padding: '8px 16px', 
+                  borderRadius: 20, 
+                  fontSize: 12, 
+                  color: ex.color,
+                  fontWeight: 600,
+                  cursor: 'pointer', 
+                  transition: 'all 0.2s', 
+                  fontFamily: 'Inter, sans-serif',
+                  boxShadow: `0 2px 6px rgba(${ex.colorRgb}, 0.05)`
                 }}
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLButtonElement).style.background = `rgba(${ex.colorRgb}, 0.12)`;
+                  (e.currentTarget as HTMLButtonElement).style.background = `rgba(${ex.colorRgb}, 0.15)`;
                   (e.currentTarget as HTMLButtonElement).style.borderColor = ex.color;
+                  (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.02)';
                 }}
                 onMouseLeave={e => {
-                  (e.currentTarget as HTMLButtonElement).style.background = `rgba(${ex.colorRgb}, 0.03)`;
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = `rgba(${ex.colorRgb}, 0.5)`;
+                  (e.currentTarget as HTMLButtonElement).style.background = `rgba(${ex.colorRgb}, 0.05)`;
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = `rgba(${ex.colorRgb}, 0.35)`;
+                  (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
                 }}
               >
                 {ex.query}
               </button>
             ))}
-          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Data Context Pop-up Modal */}
+      <AnimatePresence>
+        {showContextPopup && (
+          <div 
+            style={{ 
+              position: 'fixed', inset: 0, zIndex: 1000, 
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 20
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowContextPopup(false)}
+              style={{
+                position: 'absolute', inset: 0,
+                background: 'rgba(10, 22, 40, 0.7)',
+                backdropFilter: 'blur(8px)',
+              }}
+            />
+
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 15 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              style={{
+                position: 'relative',
+                width: '100%',
+                maxWidth: 580,
+                background: 'var(--surface-1)',
+                border: '1.5px solid var(--border-medium)',
+                borderRadius: 20,
+                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)',
+                padding: '24px 28px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
+                zIndex: 1001,
+              }}
+            >
+              {/* Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', margin: 0, marginBottom: 4 }}>
+                    Select Data Context
+                  </h3>
+                  <p style={{ fontSize: 12.5, color: 'var(--text-muted)', margin: 0, lineHeight: 1.45 }}>
+                    Choose which datasets or systems Constellation should query to answer your question.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowContextPopup(false)}
+                  style={{
+                    background: 'var(--surface-2)', border: 'none', borderRadius: '50%',
+                    width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', color: 'var(--text-muted)', transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-3)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+
+              {/* PinList (Data Context Selector) */}
+              <div style={{ margin: '8px 0' }}>
+                <PinList
+                  domains={DATA_DOMAINS.slice(0, 5)}
+                  pinnedIds={pinnedIds}
+                  onTogglePin={(id) => setPinnedIds((prev) =>
+                    prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+                  )}
+                />
+              </div>
+
+              {/* Footer Actions */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 4 }}>
+                <button
+                  onClick={() => handleFinalSubmit(true)}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid var(--border-medium)',
+                    color: 'var(--text-secondary)',
+                    padding: '10px 18px',
+                    borderRadius: 10,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-2)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                >
+                  Skip
+                </button>
+                <button
+                  onClick={() => handleFinalSubmit(false)}
+                  style={{
+                    background: 'var(--gradient-button)',
+                    border: 'none',
+                    color: '#fff',
+                    padding: '10px 20px',
+                    borderRadius: 10,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    boxShadow: '0 4px 14px rgba(192, 57, 43, 0.2)',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.02)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                >
+                  Confirm & Ask
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
