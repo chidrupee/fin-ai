@@ -137,7 +137,7 @@ export default function ChatLayout({ result, onNewQuery }: { result: QueryResult
 
       {/* Messages */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
-        <div style={{ maxWidth: 960, width: '100%', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ maxWidth: '100%', width: '100%', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
           {messages.map(msg => (
             <motion.div
               key={msg.id}
@@ -296,7 +296,7 @@ export default function ChatLayout({ result, onNewQuery }: { result: QueryResult
         padding: '12px 24px 16px',
       }}>
         <div style={{
-          maxWidth: 960, margin: '0 auto',
+          maxWidth: '100%', margin: '0 auto',
           display: 'flex', gap: 10, alignItems: 'flex-end',
           background: 'var(--canvas-bg)',
           border: '1.5px solid var(--border-medium)',
@@ -335,7 +335,7 @@ export default function ChatLayout({ result, onNewQuery }: { result: QueryResult
             <Send size={15} color={input.trim() ? '#fff' : 'var(--text-muted)'} />
           </motion.button>
         </div>
-        <p style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 7, textAlign: 'center', maxWidth: 960, margin: '7px auto 0' }}>
+        <p style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 7, textAlign: 'center', maxWidth: '100%', margin: '7px auto 0' }}>
           Suggested follow-ups will automatically switch to the right view — <strong>charts</strong>, <strong>table</strong>, or <strong>analysis</strong>
         </p>
       </div>
