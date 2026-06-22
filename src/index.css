@@ -164,6 +164,16 @@
   50% { transform: translateY(-6px); }
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.mermaid-svg-wrapper svg {
+  min-width: 80%;
+  max-width: 100%;
+  height: auto;
+}
+
 @keyframes pulseGlow {
   0%, 100% { box-shadow: 0 0 16px rgba(192, 57, 43, 0.15); }
   50% { box-shadow: 0 0 32px rgba(192, 57, 43, 0.4); }
@@ -173,6 +183,33 @@
 .animate-float { animation: float 4s ease-in-out infinite; }
 .animate-pulse-glow { animation: pulseGlow 2.5s ease-in-out infinite; }
 .animate-fade-in-up { animation: fadeInUp 0.5s ease forwards; }
+
+/* ── Chart card hover reveal ───────────────────────────── */
+.chart-container:hover .chart-delete-btn {
+  opacity: 1 !important;
+}
+.chart-container:hover .chart-drag-handle {
+  opacity: 0.8 !important;
+}
+
+/* ── Sidebar dark scrollbar ────────────────────────────── */
+aside ::-webkit-scrollbar-track { background: transparent; }
+aside ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); }
+aside ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.16); }
+
+/* ── AnalysisViewSwitcher tab underline ────────────────── */
+.avs-tab-active {
+  position: relative;
+}
+.avs-tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: -13px;
+  left: 0; right: 0;
+  height: 2px;
+  background: var(--accent-red);
+  border-radius: 2px 2px 0 0;
+}
 
 /* Mermaid light-mode override */
 .mermaid svg { background: transparent !important; max-width: 100%; }

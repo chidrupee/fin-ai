@@ -1,63 +1,66 @@
 import { useState, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MessageCircle, Table2, BarChart2, Brain, X } from 'lucide-react';
+import { Search, MessageCircle, Table2, BarChart2, Brain, X, Zap } from 'lucide-react';
 import type { StrategyMode } from '../../types';
 import RippleButton from '../../components/RippleButton/RippleButton';
 import PinList from '../../components/PinList/PinList';
 import { DATA_DOMAINS } from '../../data/mockData';
 
 interface LandingProps {
-  onSubmit: (query: string, mode: StrategyMode, pinnedIds: string[]) => void;
+  onSubmit: (query: string, mode: StrategyMode, pinnedIds: string[], autoDetected?: boolean) => void;
 }
 
 // Executive-friendly example questions — each unlocks a different capability
 const EXAMPLE_QUESTIONS = [
   {
-    query: 'What is our global revenue this quarter?',
+    query: 'What is VOIS total revenue for Q3?',
     mode: 'chat' as StrategyMode,
     label: 'Quick Answer',
     sublabel: 'Get a clear, conversational summary',
     icon: MessageCircle,
     color: '#6366f1',
     colorRgb: '99,102,241',
-    bg: 'rgba(99,102,241,0.04)',
-    border: 'rgba(99,102,241,0.15)',
   },
   {
-    query: 'Show me departmental budget vs actuals',
+    query: 'Give me a table of department budget vs actuals',
     mode: 'spreadsheet' as StrategyMode,
     label: 'Data Table',
     sublabel: 'Explore numbers in a sortable table',
     icon: Table2,
     color: '#0ea5e9',
     colorRgb: '14,165,233',
-    bg: 'rgba(14,165,233,0.04)',
-    border: 'rgba(14,165,233,0.15)',
+    auto: true
   },
   {
-    query: 'Show me regional revenue performance',
+    query: 'Break this down by region and show me the charts',
     mode: 'visual' as StrategyMode,
     label: 'Visual Dashboard',
     sublabel: 'Interactive charts — click to drill down',
     icon: BarChart2,
     color: '#10b981',
     colorRgb: '16,185,129',
-    bg: 'rgba(16,185,129,0.04)',
-    border: 'rgba(16,185,129,0.15)',
+    auto: true
   },
   {
-    query: "What's driving the Q3 headcount cost increase?",
+    query: "Analysis: why is the EMEA margin declining?",
     mode: 'analytical' as StrategyMode,
     label: 'Deep Analysis',
     sublabel: 'Narrative findings, root causes & actions',
     icon: Brain,
     color: '#c0392b',
     colorRgb: '192,57,43',
-    bg: 'rgba(192,57,43,0.04)',
-    border: 'rgba(192,57,43,0.15)',
+    auto: true
   },
 ];
+
+function detectMode(query: string): StrategyMode {
+  const q = query.toLowerCase();
+  if (q.includes('table') || q.includes('budget vs') || q.includes('actuals')) return 'spreadsheet';
+  if (q.includes('analysis') || q.includes('why') || q.includes('root cause') || q.includes('driving')) return 'analytical';
+  if (q.includes('chart') || q.includes('show me') || q.includes('trend') || q.includes('visual') || q.includes('compare')) return 'visual';
+  return 'chat';
+}
 
 export default function Landing({ onSubmit }: LandingProps) {
   const [query, setQuery] = useState('');
@@ -67,26 +70,28 @@ export default function Landing({ onSubmit }: LandingProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const hasQuery = query.trim().length > 0;
-  const hasMode = selectedMode !== null;
-  const isActive = hasQuery || hasMode;
-
-  const isSubmitDisabled = !hasQuery || !hasMode;
+  
+  // Now we can submit if we just have a query
+  const isSubmitDisabled = !hasQuery;
 
   let buttonText = 'Ask Constellation';
-  if (isActive) {
-    if (!hasMode) buttonText = 'Select Mode';
-    else if (!hasQuery) buttonText = 'Enter Question';
+  if (hasQuery && !selectedMode) {
+    buttonText = 'Ask (Auto Detect)';
   }
 
   const handleStartSubmit = () => {
-    if (!query.trim() || !selectedMode) return;
+    if (!query.trim()) return;
     setShowContextPopup(true);
   };
 
   const handleFinalSubmit = (skipContext: boolean) => {
-    if (!query.trim() || !selectedMode) return;
+    if (!query.trim()) return;
     const finalContext = skipContext ? [] : pinnedIds;
-    onSubmit(query.trim(), selectedMode, finalContext);
+    
+    const autoDetected = !selectedMode;
+    const modeToUse = selectedMode || detectMode(query);
+    
+    onSubmit(query.trim(), modeToUse, finalContext, autoDetected);
     setShowContextPopup(false);
   };
 
@@ -94,7 +99,7 @@ export default function Landing({ onSubmit }: LandingProps) {
     if (e.key === 'Enter') handleStartSubmit();
     if (e.key === 'Tab' && !query) {
       e.preventDefault();
-      setQuery('Show me regional revenue performance');
+      setQuery('Break this down by region and show me the charts');
     }
   };
 
@@ -186,6 +191,11 @@ export default function Landing({ onSubmit }: LandingProps) {
                 <span style={{ fontSize: 13, fontWeight: 700, color: isSelected ? ex.color : 'var(--text-primary)' }}>
                   {ex.label}
                 </span>
+                {'auto' in ex && ex.auto && (
+                  <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 3, background: 'rgba(255,183,77,0.15)', color: '#ffb74d', padding: '2px 6px', borderRadius: 10, fontSize: 10, fontWeight: 700 }}>
+                    <Zap size={10} fill="#ffb74d" /> Auto
+                  </div>
+                )}
               </div>
               <span style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.45 }}>
                 {ex.sublabel}

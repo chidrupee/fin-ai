@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import type { ChartConfig } from '../../types';
 
-interface AnimatedHeatmapChartProps extends Omit<ChartConfig, 'type'> {
+interface AnimatedHeatmapChartProps extends Omit<ChartConfig, 'type' | 'id'> {
   height?: number;
 }
 

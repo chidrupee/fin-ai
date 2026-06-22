@@ -19,9 +19,10 @@ interface ResultsProps {
   onNewQuery: (query: string, mode?: StrategyMode) => void;
   onCompare?: () => void;
   isCompareMode?: boolean;
+  backLabel?: string;
 }
 
-export default function Results({ result, onBack, onNewQuery, onCompare, isCompareMode }: ResultsProps) {
+export default function Results({ result, onBack, onNewQuery, onCompare, isCompareMode, backLabel }: ResultsProps) {
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({
     Region: 'All',
     Department: 'All',
@@ -72,6 +73,7 @@ export default function Results({ result, onBack, onNewQuery, onCompare, isCompa
           onBack={onBack}
           onNewQuery={onNewQuery}
           onCompare={onCompare}
+          backLabel={backLabel}
         />
       )}
 

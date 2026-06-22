@@ -27,39 +27,87 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  // Stack of previous results for back-navigation (e.g. chat → visual → back to chat)
+  const [resultHistory, setResultHistory] = useState<QueryResult[]>([]);
 
-  const handleQuery = (query: string, mode: StrategyMode, pinnedIds: string[]) => {
+  const handleQuery = (query: string, mode: StrategyMode, pinnedIds: string[], autoDetected?: boolean) => {
+    // If we're currently on a chat result and navigating to a non-chat mode,
+    // push the current chat result to the back-history stack NOW (before loading)
+    setState(prev => {
+      if (prev.currentResult && prev.currentResult.mode === 'chat' && mode !== 'chat') {
+        setResultHistory(h => [...h, prev.currentResult!]);
+      }
+      return prev;
+    });
+
     setIsLoading(true);
     setTimeout(() => {
       const result = findResult(query, mode);
-      const resultWithMode = { ...result, query, mode };
+      const resultWithMode = { ...result, query, mode, autoDetectedMode: autoDetected };
       const threadId = state.currentSessionThreadId || `thread-${Date.now()}`;
-      setState((prev) => ({
-        ...prev,
-        view: 'results',
-        currentQuery: query,
-        currentMode: mode,
-        pinnedDomains: pinnedIds,
-        currentResult: resultWithMode,
-        currentSessionThreadId: threadId,
-      }));
+
+      setState((prev) => {
+        const newSessionEntry = {
+          id: `s-${Date.now()}`,
+          query,
+          timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+          resultId: resultWithMode.id,
+          mode,
+          sessionThreadId: threadId,
+          isFollowUp: !!prev.currentSessionThreadId,
+          autoDetectedMode: autoDetected
+        };
+
+        const newHistory = [...prev.sessionHistory];
+        if (newHistory.length > 0) {
+          newHistory[0] = {
+            ...newHistory[0],
+            sessions: [...newHistory[0].sessions, newSessionEntry]
+          };
+        }
+
+        return {
+          ...prev,
+          view: 'results',
+          currentQuery: query,
+          currentMode: mode,
+          pinnedDomains: pinnedIds,
+          currentResult: resultWithMode,
+          currentSessionThreadId: threadId,
+          sessionHistory: newHistory
+        };
+      });
       setIsLoading(false);
     }, 1400);
   };
 
   const handleSessionClick = (result: QueryResult) => {
+    // Clear the history when navigating via sidebar (fresh navigation, not a drill-through)
+    setResultHistory([]);
     setState((prev) => ({
       ...prev,
       view: 'results',
       currentQuery: result.query,
       currentMode: result.mode,
       currentResult: result,
-      currentSessionThreadId: undefined,
     }));
   };
 
   const handleBack = () => {
-    setState((prev) => ({ ...prev, view: 'landing', currentResult: null, compareLeft: null, compareRight: null, currentSessionThreadId: undefined }));
+    // If there's a previous result in history, go back to it instead of landing
+    if (resultHistory.length > 0) {
+      const prev = resultHistory[resultHistory.length - 1];
+      setResultHistory(h => h.slice(0, -1));
+      setState(s => ({
+        ...s,
+        view: 'results',
+        currentQuery: prev.query,
+        currentMode: prev.mode,
+        currentResult: prev,
+      }));
+    } else {
+      setState((prev) => ({ ...prev, view: 'landing', currentResult: null, compareLeft: null, compareRight: null }));
+    }
   };
 
   const handleCompare = () => {
@@ -210,6 +258,7 @@ export default function App() {
                 onBack={handleBack}
                 onNewQuery={(q, m) => handleQuery(q, m ?? state.currentMode, state.pinnedDomains)}
                 onCompare={handleCompare}
+                backLabel={resultHistory.length > 0 ? '← Back to Chat' : undefined}
               />
             </motion.div>
           ) : state.view === 'compare' && state.compareLeft ? (

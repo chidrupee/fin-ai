@@ -4,9 +4,10 @@ import { Search, ArrowLeft, Brain, BarChart2, Code, Lightbulb, Check, Copy } fro
 import type { StrategyMode } from '../../../types';
 import { detectDeepDive } from '../utils';
 
-export default function QueryBar({ query, mode, onBack, onNewQuery, onCompare }: {
+export default function QueryBar({ query, mode, onBack, onNewQuery, onCompare, backLabel }: {
   query: string; mode: StrategyMode;
   onBack: () => void; onNewQuery: (q: string, mode?: StrategyMode) => void; onCompare?: () => void;
+  backLabel?: string;
 }) {
   const [q, setQ] = useState(query);
   const [showSql, setShowSql] = useState(false);
@@ -44,7 +45,7 @@ export default function QueryBar({ query, mode, onBack, onNewQuery, onCompare }:
         onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-3)'; }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-2)'; }}
       >
-        <ArrowLeft size={11} /> New Query
+        <ArrowLeft size={11} /> {backLabel ?? 'New Query'}
       </button>
 
       <div style={{

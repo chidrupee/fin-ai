@@ -25,8 +25,11 @@ export type KPICard = {
 export type ChartDataPoint = Record<string, string | number>;
 export type LineConfig = { key: string; color: string; label: string };
 
+export type ChartType = 'bar' | 'waterfall' | 'scatter' | 'line' | 'pie' | 'heatmap';
+
 export type ChartConfig = {
-  type: 'bar' | 'waterfall' | 'scatter' | 'line' | 'pie' | 'heatmap';
+  id: string; // unique stable id for drag-reorder
+  type: ChartType;
   title: string;
   caption: string;
   dataKey: string;
@@ -36,8 +39,10 @@ export type ChartConfig = {
   referenceValue?: number;
   data: ChartDataPoint[];
   color?: string;
-  drillDown?: Record<string, ChartDataPoint[]>; // click bar label → sub-data
-  filterKey?: string; // field to filter on (e.g. 'region')
+  drillDown?: Record<string, ChartDataPoint[]>;
+  filterKey?: string;
+  /** Whether this chart is the designated demo target for the chart-type switcher */
+  isDemoSwitchTarget?: boolean;
 };
 
 export type DashboardLink = {
@@ -55,6 +60,8 @@ export type NarrativeSection = {
   improvements: string;
   gaps: string;
   mermaidChart?: string;
+  /** Timeline events for the alternative analysis view */
+  timelineEvents?: { date: string; label: string; detail: string; type: 'cause' | 'effect' | 'action' }[];
   dashboardLinks: DashboardLink[];
 };
 
@@ -62,6 +69,8 @@ export type RecommendedPrompt = {
   id: string;
   label: string;
   query: string;
+  /** Auto-detected mode override */
+  autoMode?: StrategyMode;
 };
 
 // ── Chat types ────────────────────────────────────────────────────────────────
@@ -92,6 +101,8 @@ export type QueryResult = {
   id: string;
   query: string;
   mode: StrategyMode;
+  /** True when the mode was auto-detected (not user-chosen) */
+  autoDetectedMode?: boolean;
   timestamp: string;
   kpis: KPICard[];
   narrative: NarrativeSection;
@@ -107,8 +118,10 @@ export type SessionEntry = {
   query: string;
   timestamp: string;
   resultId: string;
-  sessionThreadId?: string; // groups follow-up queries
+  mode: StrategyMode;
+  sessionThreadId?: string;
   isFollowUp?: boolean;
+  autoDetectedMode?: boolean;
 };
 
 export type SessionGroup = {
