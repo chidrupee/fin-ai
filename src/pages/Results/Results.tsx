@@ -86,7 +86,7 @@ export default function Results({ result, onBack, onNewQuery, onCompare, isCompa
         )}
 
         {/* Mode router */}
-        {result.mode === 'chat' ? (
+        {(result.mode === 'chat' || result.mode === 'investigative') ? (
           <ChatLayout result={result} onNewQuery={onNewQuery} />
         ) : result.mode === 'spreadsheet' ? (
           <SpreadsheetLayout result={result} />

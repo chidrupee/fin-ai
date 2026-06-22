@@ -1,6 +1,6 @@
 // ── Core Domain Types ─────────────────────────────────────────────────────────
 
-export type StrategyMode = 'analytical' | 'visual' | 'chat' | 'spreadsheet';
+export type StrategyMode = 'analytical' | 'visual' | 'chat' | 'spreadsheet' | 'investigative';
 
 export type DataDomain = {
   id: string;
@@ -80,6 +80,8 @@ export type ChatMessage = {
   content: string;
   timestamp: string;
   suggestedFollowUps?: string[];
+  insights?: string[];
+  chart?: ChartConfig;
 };
 
 // ── Spreadsheet types ─────────────────────────────────────────────────────────
@@ -110,6 +112,7 @@ export type QueryResult = {
   recommendedPrompts: RecommendedPrompt[];
   chatMessages?: ChatMessage[];
   spreadsheetData?: SpreadsheetData;
+  sqlCode?: string;
 };
 
 // ── Session / history ─────────────────────────────────────────────────────────

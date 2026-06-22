@@ -17,6 +17,7 @@ const DEMO_ROUTE_MAP: { keywords: string[]; mode: StrategyMode }[] = [
   { keywords: ['compare'], mode: 'visual' },
   { keywords: ['table', 'spreadsheet', 'actuals'], mode: 'spreadsheet' },
   { keywords: ['analysis', 'why is', 'what is driving', 'root cause'], mode: 'analytical' },
+  { keywords: ['investigate', 'anomaly', 'deep dive into'], mode: 'investigative' },
   { keywords: ['chart', 'show me', 'visual', 'trend', 'breakdown'], mode: 'visual' },
 ];
 

@@ -34,6 +34,44 @@ export const MOCK_RESULTS: Record<string, QueryResult> = {
         role: 'ai',
         content: 'Global revenue for **VOIS Q3 FY2026** is **$287.3M**, up **4.1% QoQ** from $275.9M — broadly on track with the annual plan of $1.1B.\n\n**Regional split:**\n• Americas — $115.2M (+6.2%)\n• EMEA — $98.4M (+1.8%) — growth slowing\n• APAC — $73.7M (+4.9%)\n\nServices revenue grew faster (+8.2%) than product revenue (+2.1%). Overall margin stands at 31.2%, which is below the 40% target.',
         timestamp: '09:00',
+        insights: [
+          'Services revenue outpaced product growth significantly (+8.2% vs +2.1%).',
+          'Overall margin is lagging at 31.2% against a 40% target.',
+          'EMEA growth has decelerated to +1.8%, marking the slowest quarter in the last 18 months.',
+          'Americas enterprise software deals contributed +$4.5M to the regional beat.'
+        ],
+        chart: {
+          id: 'mini-revenue-chart',
+          type: 'bar',
+          title: 'Q3 Revenue by Region ($M)',
+          dataKey: 'revenue',
+          xKey: 'region',
+          data: [
+            { region: 'Americas', revenue: 115.2 },
+            { region: 'EMEA', revenue: 98.4 },
+            { region: 'APAC', revenue: 73.7 },
+          ],
+          caption: '* Click on a data point to drill down into sub-region details',
+          drillDown: {
+            'Americas': [
+              { region: 'United States', revenue: 89.4 },
+              { region: 'Canada', revenue: 14.8 },
+              { region: 'LATAM', revenue: 11.0 },
+            ],
+            'EMEA': [
+              { region: 'United Kingdom', revenue: 38.2 },
+              { region: 'Germany', revenue: 28.4 },
+              { region: 'France', revenue: 18.9 },
+              { region: 'Other EU', revenue: 12.9 },
+            ],
+            'APAC': [
+              { region: 'Australia', revenue: 22.1 },
+              { region: 'Singapore', revenue: 18.4 },
+              { region: 'India', revenue: 16.5 },
+              { region: 'Japan', revenue: 16.7 },
+            ]
+          }
+        },
         suggestedFollowUps: [
           'Break this down by region and show me the charts',
           'Give me a table of department budget vs actuals',
@@ -375,6 +413,41 @@ export const MOCK_RESULTS: Record<string, QueryResult> = {
     recommendedPrompts: [
       { id: 'rp1', label: 'Review EMEA decline', query: 'Analysis: why is the EMEA margin declining?', autoMode: 'analytical' }
     ],
+  },
+  'vois-investigative-chat': {
+    id: 'vois-investigative-chat',
+    query: 'Investigate the Vodafone business margin anomaly',
+    mode: 'investigative',
+    timestamp: '2026-06-22T10:00:00Z',
+    kpis: [],
+    chatMessages: [
+      { id: 'm1', role: 'user', content: 'Investigate the Vodafone business margin anomaly', timestamp: '10:00' },
+      { 
+        id: 'm2', 
+        role: 'ai', 
+        content: 'I have analyzed the margin anomaly for the Vodafone account. The overall margin dropped from 42% to 28% in the last quarter. This is primarily driven by a surge in cloud infrastructure costs and unbilled support hours.', 
+        timestamp: '10:01',
+        insights: [
+          'AWS Egress Costs: +$125K over budget in US-East-1.',
+          'Unbilled Support: 450 hours logged as pre-sales instead of billable support.',
+          'SLA Penalties: $15K penalty triggered by a 42-minute outage in August.'
+        ],
+        chart: {
+          id: 'chart-voda-margin',
+          type: 'bar', title: 'Vodafone Margin vs Target (%)', caption: '',
+          dataKey: 'margin', xKey: 'quarter',
+          data: [
+            { quarter: 'Q1', margin: 43 },
+            { quarter: 'Q2', margin: 42 },
+            { quarter: 'Q3', margin: 28 },
+          ]
+        },
+        suggestedFollowUps: ['Show me the resource allocation breakdown', 'Generate a full analytical report'] 
+      }
+    ],
+    narrative: { findings: '', drivers: '', improvements: '', gaps: '', dashboardLinks: [] },
+    charts: [],
+    recommendedPrompts: []
   }
 };
 
@@ -386,7 +459,8 @@ export const DEFAULT_QUERY_MAP: Array<{ keywords: string[]; resultId: string; au
   { keywords: ['table of department', 'budget vs actuals', 'table'], resultId: 'vois-budget-table', autoMode: 'spreadsheet' },
   { keywords: ['analysis: why', 'emea margin declining', 'analysis'], resultId: 'vois-emea-analysis', autoMode: 'analytical' },
   { keywords: ['compare engineering', 'headcount cost vs sales', 'compare'], resultId: 'vois-headcount-compare', autoMode: 'visual' },
-  { keywords: ['apac margin expanding', 'apac margin'], resultId: 'vois-apac-margin-analysis', autoMode: 'analytical' }
+  { keywords: ['apac margin expanding', 'apac margin'], resultId: 'vois-apac-margin-analysis', autoMode: 'analytical' },
+  { keywords: ['investigate', 'vodafone business margin anomaly'], resultId: 'vois-investigative-chat', autoMode: 'investigative' }
 ];
 
 export function findResult(query: string, _mode?: string): QueryResult {
@@ -399,6 +473,7 @@ export function findResult(query: string, _mode?: string): QueryResult {
   if (q.includes('emea margin declining')) return MOCK_RESULTS['vois-emea-analysis'];
   if (q.includes('apac margin expanding')) return MOCK_RESULTS['vois-apac-margin-analysis'];
   if (q.includes('compare engineering headcount')) return MOCK_RESULTS['vois-headcount-compare'];
+  if (q.includes('investigate the vodafone')) return MOCK_RESULTS['vois-investigative-chat'];
 
   // Keyword matching
   for (const mapping of DEFAULT_QUERY_MAP) {

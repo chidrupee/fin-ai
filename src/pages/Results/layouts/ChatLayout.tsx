@@ -1,14 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, BarChart2, Table2, Brain, MessageCircle, ArrowRight } from 'lucide-react';
+import { Send, BarChart2, Table2, Brain, MessageCircle, ArrowRight, LayoutGrid, List } from 'lucide-react';
 import type { QueryResult, ChatMessage, StrategyMode } from '../../../types';
 import { detectDeepDive } from '../utils';
+import ChartRenderer from '../components/ChartRenderer';
 
 const MODE_META: Record<StrategyMode, { label: string; color: string; colorRgb: string; Icon: React.ElementType }> = {
   visual:      { label: 'View Charts',    color: '#10b981', colorRgb: '16,185,129',  Icon: BarChart2    },
   spreadsheet: { label: 'View Table',     color: '#0ea5e9', colorRgb: '14,165,233',  Icon: Table2       },
   analytical:  { label: 'Deep Analysis',  color: '#c0392b', colorRgb: '192,57,43',   Icon: Brain        },
   chat:        { label: 'Ask Follow-up',  color: '#6366f1', colorRgb: '99,102,241',  Icon: MessageCircle },
+  investigative: { label: 'Investigate', color: '#8b5cf6', colorRgb: '139,92,246', Icon: Brain },
 };
 
 function SuggestedFollowUp({
@@ -79,6 +81,7 @@ export default function ChatLayout({ result, onNewQuery }: { result: QueryResult
   const [messages, setMessages] = useState<ChatMessage[]>(result.chatMessages || []);
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
+  const [isStacked, setIsStacked] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Sync when result changes (navigating back to chat)
@@ -134,7 +137,7 @@ export default function ChatLayout({ result, onNewQuery }: { result: QueryResult
 
       {/* Messages */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
-        <div style={{ maxWidth: 760, width: '100%', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ maxWidth: 960, width: '100%', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
           {messages.map(msg => (
             <motion.div
               key={msg.id}
@@ -155,7 +158,7 @@ export default function ChatLayout({ result, onNewQuery }: { result: QueryResult
                 </div>
               )}
 
-              <div style={{ maxWidth: '80%', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ maxWidth: (msg.insights || msg.chart) ? '100%' : '85%', width: (msg.insights || msg.chart) ? '100%' : 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {/* Bubble */}
                 <div style={{
                   background: msg.role === 'ai' ? 'var(--surface-1)' : 'var(--gradient-button)',
@@ -168,6 +171,59 @@ export default function ChatLayout({ result, onNewQuery }: { result: QueryResult
                     : '0 4px 14px rgba(192,57,43,0.25)',
                 }}>
                   {renderContent(msg.content)}
+                  
+                  {/* Rich Content: Insights & Chart */}
+                  {(msg.insights || msg.chart) && (
+                    <div style={{
+                      marginTop: 16, paddingTop: 16,
+                      borderTop: '1px solid var(--border-light)',
+                      display: 'flex', flexDirection: 'column', gap: 12
+                    }}>
+                      {/* Controls */}
+                      {(msg.insights && msg.chart) && (
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
+                          <button 
+                            onClick={() => setIsStacked(false)}
+                            style={{ background: !isStacked ? 'var(--surface-3)' : 'transparent', border: 'none', borderRadius: 4, padding: 4, cursor: 'pointer', color: !isStacked ? 'var(--text-primary)' : 'var(--text-muted)', display: 'flex', transition: 'all 0.2s' }}
+                            title="Side-by-side view"
+                          >
+                            <LayoutGrid size={14} />
+                          </button>
+                          <button 
+                            onClick={() => setIsStacked(true)}
+                            style={{ background: isStacked ? 'var(--surface-3)' : 'transparent', border: 'none', borderRadius: 4, padding: 4, cursor: 'pointer', color: isStacked ? 'var(--text-primary)' : 'var(--text-muted)', display: 'flex', transition: 'all 0.2s' }}
+                            title="Stacked view"
+                          >
+                            <List size={14} />
+                          </button>
+                        </div>
+                      )}
+
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: (msg.insights && msg.chart && !isStacked) ? 'repeat(auto-fit, minmax(300px, 1fr))' : '1fr',
+                        gap: 16,
+                        alignItems: 'stretch'
+                      }}>
+                      {msg.insights && (
+                        <div style={{ background: 'var(--surface-2)', borderRadius: 8, padding: 16, border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                          <h4 style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>Key Insights</h4>
+                          <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--text-secondary)', fontSize: 13, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {msg.insights.map((insight, idx) => (
+                              <li key={idx} style={{ lineHeight: 1.5 }}>{insight}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {msg.chart && (
+                        <div style={{ background: 'var(--surface-2)', borderRadius: 8, padding: 16, border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                           <ChartRenderer chart={msg.chart} height={180} />
+                        </div>
+                      )}
+                    </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Suggested follow-ups — these are mode navigation links */}
@@ -240,7 +296,7 @@ export default function ChatLayout({ result, onNewQuery }: { result: QueryResult
         padding: '12px 24px 16px',
       }}>
         <div style={{
-          maxWidth: 760, margin: '0 auto',
+          maxWidth: 960, margin: '0 auto',
           display: 'flex', gap: 10, alignItems: 'flex-end',
           background: 'var(--canvas-bg)',
           border: '1.5px solid var(--border-medium)',
@@ -279,7 +335,7 @@ export default function ChatLayout({ result, onNewQuery }: { result: QueryResult
             <Send size={15} color={input.trim() ? '#fff' : 'var(--text-muted)'} />
           </motion.button>
         </div>
-        <p style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 7, textAlign: 'center', maxWidth: 760, margin: '7px auto 0' }}>
+        <p style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 7, textAlign: 'center', maxWidth: 960, margin: '7px auto 0' }}>
           Suggested follow-ups will automatically switch to the right view — <strong>charts</strong>, <strong>table</strong>, or <strong>analysis</strong>
         </p>
       </div>
