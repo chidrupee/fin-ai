@@ -206,13 +206,17 @@ export default function ChatLayout({ result, onNewQuery }: { result: QueryResult
                         alignItems: 'stretch'
                       }}>
                       {msg.insights && (
-                        <div style={{ background: 'var(--surface-2)', borderRadius: 8, padding: 16, border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                          <h4 style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>Key Insights</h4>
-                          <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--text-secondary)', fontSize: 13, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            {msg.insights.map((insight, idx) => (
-                              <li key={idx} style={{ lineHeight: 1.5 }}>{insight}</li>
-                            ))}
-                          </ul>
+                        <div style={{ background: 'var(--surface-2)', borderRadius: 8, padding: 16, border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                          {msg.insights.map((section, sIdx) => (
+                            <div key={sIdx} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                              <h4 style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>{section.title}</h4>
+                              <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--text-secondary)', fontSize: 13, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                {section.items.map((item, iIdx) => (
+                                  <li key={iIdx} style={{ lineHeight: 1.5 }}>{item}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
                         </div>
                       )}
                       

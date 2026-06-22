@@ -80,7 +80,7 @@ export type ChatMessage = {
   content: string;
   timestamp: string;
   suggestedFollowUps?: string[];
-  insights?: string[];
+  insights?: { title: string; items: string[] }[];
   chart?: ChartConfig;
 };
 

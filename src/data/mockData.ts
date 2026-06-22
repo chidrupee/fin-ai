@@ -35,10 +35,27 @@ export const MOCK_RESULTS: Record<string, QueryResult> = {
         content: 'Global revenue for **VOIS Q3 FY2026** is **$287.3M**, up **4.1% QoQ** from $275.9M — broadly on track with the annual plan of $1.1B.\n\n**Regional split:**\n• Americas — $115.2M (+6.2%)\n• EMEA — $98.4M (+1.8%) — growth slowing\n• APAC — $73.7M (+4.9%)\n\nServices revenue grew faster (+8.2%) than product revenue (+2.1%). Overall margin stands at 31.2%, which is below the 40% target.',
         timestamp: '09:00',
         insights: [
-          'Services revenue outpaced product growth significantly (+8.2% vs +2.1%).',
-          'Overall margin is lagging at 31.2% against a 40% target.',
-          'EMEA growth has decelerated to +1.8%, marking the slowest quarter in the last 18 months.',
-          'Americas enterprise software deals contributed +$4.5M to the regional beat.'
+          {
+            title: 'Key Findings',
+            items: [
+              'Services revenue outpaced product growth significantly (+8.2% vs +2.1%).',
+              'Overall margin is lagging at 31.2% against a 40% target.',
+            ]
+          },
+          {
+            title: 'Primary Drivers',
+            items: [
+              'EMEA growth has decelerated to +1.8%, marking the slowest quarter in the last 18 months.',
+              'Americas enterprise software deals contributed +$4.5M to the regional beat.'
+            ]
+          },
+          {
+            title: 'Next Steps',
+            items: [
+              'Accelerate EMEA enterprise pipeline conversion.',
+              'Renegotiate underperforming service contracts in Q4.'
+            ]
+          }
         ],
         chart: {
           id: 'mini-revenue-chart',
@@ -428,9 +445,21 @@ export const MOCK_RESULTS: Record<string, QueryResult> = {
         content: 'I have analyzed the margin anomaly for the Vodafone account. The overall margin dropped from 42% to 28% in the last quarter. This is primarily driven by a surge in cloud infrastructure costs and unbilled support hours.', 
         timestamp: '10:01',
         insights: [
-          'AWS Egress Costs: +$125K over budget in US-East-1.',
-          'Unbilled Support: 450 hours logged as pre-sales instead of billable support.',
-          'SLA Penalties: $15K penalty triggered by a 42-minute outage in August.'
+          {
+            title: 'Cost Drivers',
+            items: [
+              'AWS Egress Costs: +$125K over budget in US-East-1.',
+              'Unbilled Support: 450 hours logged as pre-sales instead of billable support.',
+              'SLA Penalties: $15K penalty triggered by a 42-minute outage in August.'
+            ]
+          },
+          {
+            title: 'Next Steps',
+            items: [
+              'Implement AWS Cost Anomaly Detection alerts for egress traffic.',
+              'Re-classify the 450 support hours to the correct billable code.'
+            ]
+          }
         ],
         chart: {
           id: 'chart-voda-margin',
